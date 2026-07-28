@@ -4,6 +4,7 @@
 # Everything else at the repo root stays local and untracked.
 /*
 !.gitignore
+!README.md
 !stimulus/
 !swarm_lab_jiang_v1/
 

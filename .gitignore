@@ -1,0 +1,39 @@
+# This repository publishes only two subdirectories:
+#   stimulus/            (web-based bearing-formation simulator)
+#   swarm_lab_jiang_v1/  (ROS2 real-vehicle formation control project)
+# Everything else at the repo root stays local and untracked.
+/*
+!.gitignore
+!stimulus/
+!swarm_lab_jiang_v1/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build and packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# Runtime output
+runs/
+logs/
+*.log
+
+# Local editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

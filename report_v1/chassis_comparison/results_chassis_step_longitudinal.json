@@ -1,0 +1,92 @@
+[
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_133708_omni",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.451427,
+          5.895737
+        ],
+        "mean_target_mps": [
+          0.15,
+          0.0
+        ],
+        "mean_actual_mps": [
+          0.25506360336345524,
+          -0.030606152172621075
+        ],
+        "residual_mps": [
+          0.10506360336345524,
+          -0.030606152172621075
+        ],
+        "mean_target_speed_mps": 0.15,
+        "mean_actual_speed_mps": 0.25690183490345647,
+        "speed_residual_mps": 0.10690183490345648,
+        "speed_residual_pct": 71.26788993563765,
+        "direction_error_deg": -6.84244562339151,
+        "velocity_rmse_mps": 0.10974967671308533
+      }
+    }
+  },
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_133746_omni_pid",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.45014,
+          5.896867
+        ],
+        "mean_target_mps": [
+          0.15,
+          0.0
+        ],
+        "mean_actual_mps": [
+          0.17808717409319444,
+          -0.0030373815626801807
+        ],
+        "residual_mps": [
+          0.028087174093194445,
+          -0.0030373815626801807
+        ],
+        "mean_target_speed_mps": 0.15,
+        "mean_actual_speed_mps": 0.178902689897541,
+        "speed_residual_mps": 0.028902689897540995,
+        "speed_residual_pct": 19.268459931693997,
+        "direction_error_deg": -0.9771185011910245,
+        "velocity_rmse_mps": 0.04423673434248723
+      }
+    }
+  },
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_134235_diff",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.43443,
+          5.878728
+        ],
+        "mean_target_mps": [
+          0.15,
+          0.0
+        ],
+        "mean_actual_mps": [
+          0.12591538155151494,
+          -0.005918331896133974
+        ],
+        "residual_mps": [
+          -0.024084618448485057,
+          -0.005918331896133974
+        ],
+        "mean_target_speed_mps": 0.15,
+        "mean_actual_speed_mps": 0.12663602222224044,
+        "speed_residual_mps": -0.02336397777775956,
+        "speed_residual_pct": -15.57598518517304,
+        "direction_error_deg": -2.6910616667104303,
+        "velocity_rmse_mps": 0.04426515625856806
+      }
+    }
+  }
+]

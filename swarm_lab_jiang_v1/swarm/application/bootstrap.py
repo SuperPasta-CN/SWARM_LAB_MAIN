@@ -14,6 +14,7 @@ from typing import Any, Dict, List
 
 from swarm.algorithms.differential import DifferentialDriveController
 from swarm.algorithms.mecanum import MecanumController
+from swarm.algorithms.mecanum_pid import MecanumPidController
 from swarm.algorithms.obstacle_avoidance import ArtificialPotentialField
 from swarm.application.control_loop import ControlLoop
 from swarm.application.interfaces import TelemetrySink
@@ -88,6 +89,8 @@ def _build_vehicle_controller(config: ExperimentConfig):
             config.execution,
             config.runtime.command_speed_limit_mps,
         )
+    if config.execution.mode == "omni_pid":
+        return MecanumPidController(config.execution)
     return MecanumController(config.execution)
 
 
@@ -150,6 +153,8 @@ def build_control_loop(config: ExperimentConfig, assume_yes: bool = False) -> Co
         config.vehicle_ids,
         config.runtime.mocap_prefix,
         require_twist=config.runtime.require_twist,
+        max_plausible_speed_mps=config.runtime.max_plausible_speed_mps,
+        velocity_diff_baseline_s=config.runtime.velocity_diff_baseline_s,
     )
     try:
         planner = build_swarm_planner(config)

@@ -1,0 +1,71 @@
+{
+  "bearing_2_jyc1": {
+    "duration_s": 14.756285,
+    "centroid_start": [
+      0.035412,
+      0.1410095
+    ],
+    "centroid_end": [
+      0.6903680000000001,
+      0.23436099999999999
+    ],
+    "centroid_displacement_m": 0.6615752901131133,
+    "centroid_path_length_m": 0.941293038132312,
+    "centroid_mean_speed_mps": 0.06378929643418463,
+    "centroid_last5s_speed_mps": 0.007691196314783291,
+    "rotation_total_deg": -73.42286592144059,
+    "rotation_rate_dps": -4.9757012636609135,
+    "rotation_last5s_rate_dps": 0.009166401160917092,
+    "scale_final": 1.2335677431346483,
+    "scale_max_deviation": 0.24982855262619852,
+    "scale_change_last5s": 0.006837032078852889,
+    "shape_jitter_rms_mm": 1.0648885158809839e-13,
+    "shape_change_from_initial_mm": 3.925231146709438e-14
+  },
+  "bearing_3_jyc10": {
+    "duration_s": 18.009989,
+    "centroid_start": [
+      0.6988936666666667,
+      0.5251776666666667
+    ],
+    "centroid_end": [
+      0.895867,
+      1.1940819999999999
+    ],
+    "centroid_displacement_m": 0.6973030196382024,
+    "centroid_path_length_m": 0.7836666025595674,
+    "centroid_mean_speed_mps": 0.043512886241050305,
+    "centroid_last5s_speed_mps": 0.03875112629713219,
+    "rotation_total_deg": -3.0743341799320394,
+    "rotation_rate_dps": -0.17070161341753398,
+    "rotation_last5s_rate_dps": 0.5823016267303041,
+    "scale_final": 0.4559538427251809,
+    "scale_max_deviation": 0.5440461572748191,
+    "scale_change_last5s": -0.18665419269598538,
+    "shape_jitter_rms_mm": 5.347728393859805,
+    "shape_change_from_initial_mm": 106.1051590725368
+  },
+  "bearing_4_jyc1": {
+    "duration_s": 56.986747,
+    "centroid_start": [
+      0.17455625000000002,
+      0.34140425
+    ],
+    "centroid_end": [
+      0.75063775,
+      0.274533
+    ],
+    "centroid_displacement_m": 0.5799497036112808,
+    "centroid_path_length_m": 1.0823269520545657,
+    "centroid_mean_speed_mps": 0.018992608089290756,
+    "centroid_last5s_speed_mps": 0.001065352071483354,
+    "rotation_total_deg": -14.197123356878242,
+    "rotation_rate_dps": -0.24913026456621995,
+    "rotation_last5s_rate_dps": 0.04762900789660683,
+    "scale_final": 0.6939694498417611,
+    "scale_max_deviation": 0.31078445244962116,
+    "scale_change_last5s": -0.0005333177433501923,
+    "shape_jitter_rms_mm": 2.512570916023277,
+    "shape_change_from_initial_mm": 419.1144804676054
+  }
+}

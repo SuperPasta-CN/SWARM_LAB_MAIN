@@ -1,0 +1,272 @@
+[
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_160629_556056_diff0.05",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.425872,
+          5.857909
+        ],
+        "mean_target_mps": [
+          0.05,
+          0.0
+        ],
+        "mean_actual_mps": [
+          0.03444583757531826,
+          -0.0041643756051108205
+        ],
+        "residual_mps": [
+          -0.015554162424681744,
+          -0.0041643756051108205
+        ],
+        "mean_target_speed_mps": 0.05,
+        "mean_actual_speed_mps": 0.04235934912931842,
+        "speed_residual_mps": -0.007640650870681581,
+        "speed_residual_pct": -15.281301741363162,
+        "direction_error_deg": -6.893395354379135,
+        "velocity_rmse_mps": 0.03665108632865156
+      }
+    }
+  },
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_160707_766685_diff0.10",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.424617,
+          5.861043
+        ],
+        "mean_target_mps": [
+          0.1,
+          0.0
+        ],
+        "mean_actual_mps": [
+          0.012323866857038115,
+          0.0012652376892013815
+        ],
+        "residual_mps": [
+          -0.0876761331429619,
+          0.0012652376892013815
+        ],
+        "mean_target_speed_mps": 0.1,
+        "mean_actual_speed_mps": 0.02901132581654268,
+        "speed_residual_mps": -0.07098867418345732,
+        "speed_residual_pct": -70.9886741834573,
+        "direction_error_deg": 5.8617706821854405,
+        "velocity_rmse_mps": 0.09360618765540753
+      }
+    }
+  },
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_160801_400805_diff0.20",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.424388,
+          5.857513
+        ],
+        "mean_target_mps": [
+          0.2,
+          0.0
+        ],
+        "mean_actual_mps": [
+          0.14446873695488607,
+          -0.006853496206255697
+        ],
+        "residual_mps": [
+          -0.05553126304511394,
+          -0.006853496206255697
+        ],
+        "mean_target_speed_mps": 0.2,
+        "mean_actual_speed_mps": 0.14494395138130434,
+        "speed_residual_mps": -0.055056048618695674,
+        "speed_residual_pct": -27.52802430934784,
+        "direction_error_deg": -2.71603560606726,
+        "velocity_rmse_mps": 0.0652894971494736
+      }
+    }
+  },
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_160843_075997_omni0.05",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.42554,
+          5.858957
+        ],
+        "mean_target_mps": [
+          0.05,
+          0.0
+        ],
+        "mean_actual_mps": [
+          0.0019837887523431992,
+          0.0006477223504283234
+        ],
+        "residual_mps": [
+          -0.0480162112476568,
+          0.0006477223504283234
+        ],
+        "mean_target_speed_mps": 0.05,
+        "mean_actual_speed_mps": 0.00916630157169637,
+        "speed_residual_mps": -0.04083369842830363,
+        "speed_residual_pct": -81.66739685660725,
+        "direction_error_deg": 18.082260327726747,
+        "velocity_rmse_mps": 0.04902934550837334
+      }
+    }
+  },
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_160910_635165_omni0.10",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.421019,
+          5.859684
+        ],
+        "mean_target_mps": [
+          0.1,
+          0.0
+        ],
+        "mean_actual_mps": [
+          2.1365392545675062e-05,
+          -6.387412770973378e-06
+        ],
+        "residual_mps": [
+          -0.09997863460745433,
+          -6.387412770973378e-06
+        ],
+        "mean_target_speed_mps": 0.1,
+        "mean_actual_speed_mps": 0.000290465719790916,
+        "speed_residual_mps": -0.0997095342802091,
+        "speed_residual_pct": -99.70953428020908,
+        "direction_error_deg": -16.644598028973743,
+        "velocity_rmse_mps": 0.09997925242679487
+      }
+    }
+  },
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_161007_196051_omni0.20",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.423185,
+          5.854723
+        ],
+        "mean_target_mps": [
+          0.2,
+          0.0
+        ],
+        "mean_actual_mps": [
+          0.2040286999431622,
+          -0.0660906196132708
+        ],
+        "residual_mps": [
+          0.004028699943162184,
+          -0.0660906196132708
+        ],
+        "mean_target_speed_mps": 0.2,
+        "mean_actual_speed_mps": 0.21451186411366593,
+        "speed_residual_mps": 0.014511864113665923,
+        "speed_residual_pct": 7.255932056832961,
+        "direction_error_deg": -17.94859361958861,
+        "velocity_rmse_mps": 0.06681802992542613
+      }
+    }
+  },
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_161052_339503_omni_pid0.05",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.423379,
+          5.860108
+        ],
+        "mean_target_mps": [
+          0.05,
+          0.0
+        ],
+        "mean_actual_mps": [
+          0.006434624840794457,
+          -0.0008275141762979658
+        ],
+        "residual_mps": [
+          -0.04356537515920555,
+          -0.0008275141762979658
+        ],
+        "mean_target_speed_mps": 0.05,
+        "mean_actual_speed_mps": 0.007018772095634427,
+        "speed_residual_mps": -0.04298122790436558,
+        "speed_residual_pct": -85.96245580873116,
+        "direction_error_deg": -7.3282046981127005,
+        "velocity_rmse_mps": 0.04447349772995066
+      }
+    }
+  },
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_161134_884815_omni_pid0.10",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.427385,
+          5.859972
+        ],
+        "mean_target_mps": [
+          0.1,
+          0.0
+        ],
+        "mean_actual_mps": [
+          0.06983926553825066,
+          -0.0026169145429009604
+        ],
+        "residual_mps": [
+          -0.03016073446174934,
+          -0.0026169145429009604
+        ],
+        "mean_target_speed_mps": 0.1,
+        "mean_actual_speed_mps": 0.07065435571614491,
+        "speed_residual_mps": -0.029345644283855096,
+        "speed_residual_pct": -29.345644283855094,
+        "direction_error_deg": -2.1458994944214194,
+        "velocity_rmse_mps": 0.06197603027842141
+      }
+    }
+  },
+  {
+    "run": "swarm_lab_jiang_v1\\runs\\chassis_step_20260731_161202_089384_omni_pid0.20",
+    "vehicles": {
+      "car1": {
+        "samples": 18,
+        "window_s": [
+          2.425419,
+          5.859098
+        ],
+        "mean_target_mps": [
+          0.2,
+          0.0
+        ],
+        "mean_actual_mps": [
+          0.19526126101813607,
+          -0.006677807317620342
+        ],
+        "residual_mps": [
+          -0.004738738981863944,
+          -0.006677807317620342
+        ],
+        "mean_target_speed_mps": 0.2,
+        "mean_actual_speed_mps": 0.19633891637832124,
+        "speed_residual_mps": -0.0036610836216787734,
+        "speed_residual_pct": -1.8305418108393867,
+        "direction_error_deg": -1.9587147596651808,
+        "velocity_rmse_mps": 0.029964007249000738
+      }
+    }
+  }
+]

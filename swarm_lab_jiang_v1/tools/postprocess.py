@@ -85,6 +85,37 @@ def _angle_statistics(rows: List[Dict[str, float]]) -> Dict[str, object]:
     }
 
 
+def _position_velocity(rows: List[Dict[str, float]], baseline_s: float = 0.4) -> List[Tuple[float, float]]:
+    """Actual velocity from recorded positions via central differences.
+
+    The recorded ``measured_vx/vy`` columns come from the high-rate mocap
+    finite-difference estimator and are dominated by differentiation noise;
+    positions at 5 Hz with a ~0.4 s baseline give a far cleaner estimate of
+    what the vehicle really did.
+    """
+
+    count = len(rows)
+    velocities: List[Tuple[float, float]] = []
+    for index in range(count):
+        lo = index
+        while lo > 0 and rows[index]["time_s"] - rows[lo]["time_s"] < baseline_s / 2:
+            lo -= 1
+        hi = index
+        while hi < count - 1 and rows[hi]["time_s"] - rows[index]["time_s"] < baseline_s / 2:
+            hi += 1
+        dt = rows[hi]["time_s"] - rows[lo]["time_s"]
+        if dt <= 0.0:
+            velocities.append((0.0, 0.0))
+        else:
+            velocities.append(
+                (
+                    (rows[hi]["x_m"] - rows[lo]["x_m"]) / dt,
+                    (rows[hi]["y_m"] - rows[lo]["y_m"]) / dt,
+                )
+            )
+    return velocities
+
+
 def _metrics(
     vehicles: VehicleRows,
     bearing_edges: Optional[BearingEdgeRows] = None,
@@ -100,14 +131,24 @@ def _metrics(
             hypot(current["x_m"] - previous["x_m"], current["y_m"] - previous["y_m"])
             for previous, current in zip(rows, rows[1:])
         )
+        # Actual velocity comes from position central differences (the
+        # recorded measured_vx/vy columns are differentiation noise).
+        actual_velocity = _position_velocity(rows)
         speed_error_sq = [
-            (row["target_speed_mps"] - row["measured_speed_mps"]) ** 2 for row in rows
+            (row["target_speed_mps"] - hypot(vax, vay)) ** 2
+            for row, (vax, vay) in zip(rows, actual_velocity)
+        ]
+        # Velocity-vector tracking error: ||v_target - v_actual|| per sample.
+        velocity_error_sq = [
+            (row["target_vx_mps"] - vax) ** 2 + (row["target_vy_mps"] - vay) ** 2
+            for row, (vax, vay) in zip(rows, actual_velocity)
         ]
         vehicle_metrics[vehicle_id] = {
             "samples": len(rows),
             "duration_s": rows[-1]["time_s"] - rows[0]["time_s"] if len(rows) > 1 else 0.0,
             "path_length_m": path_length,
             "speed_rmse_mps": sqrt(sum(speed_error_sq) / len(speed_error_sq)) if speed_error_sq else 0.0,
+            "velocity_rmse_mps": sqrt(sum(velocity_error_sq) / len(velocity_error_sq)) if velocity_error_sq else 0.0,
             "send_success_rate": (
                 sum(row["command_sent"] for row in rows) / len(rows) if rows else 0.0
             ),
@@ -122,6 +163,28 @@ def _metrics(
     return result
 
 
+def _overall_formation_error(
+    bearing_edges: BearingEdgeRows,
+) -> Tuple[List[float], List[float]]:
+    """RMS of every valid directed-edge bearing error at each timestamp.
+
+    This is the whole-formation tracking error: how far the current
+    configuration is from the desired bearing shape, as one scalar curve.
+    """
+
+    per_time: Dict[float, List[float]] = defaultdict(list)
+    for rows in bearing_edges.values():
+        for row in rows:
+            if row.get("bearing_valid", 0.0) == 1.0 and isfinite(row["bearing_error_deg"]):
+                per_time[round(row["time_s"], 6)].append(row["bearing_error_deg"])
+    times = sorted(per_time)
+    rms = [
+        sqrt(sum(value * value for value in per_time[t]) / len(per_time[t]))
+        for t in times
+    ]
+    return times, rms
+
+
 def _plot(
     run_directory: Path,
     vehicles: VehicleRows,
@@ -132,8 +195,11 @@ def _plot(
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    figure, axes = plt.subplots(1, 3, figsize=(16, 5))
-    trajectory_axes, error_axes, speed_axes = axes
+    edge_rows = bearing_edges or defaultdict(list)
+    figure, axes_grid = plt.subplots(2, 2, figsize=(14, 9))
+    trajectory_axes, error_axes = axes_grid[0]
+    formation_axes, velocity_axes = axes_grid[1]
+
     for vehicle_id, rows in vehicles.items():
         times = [row["time_s"] for row in rows]
         trajectory_axes.plot(
@@ -141,20 +207,31 @@ def _plot(
             [row["y_m"] for row in rows],
             label=vehicle_id,
         )
-        speed_axes.plot(times, [row["measured_speed_mps"] for row in rows], label=vehicle_id + " actual")
-        speed_axes.plot(
+        # Per-vehicle desired-velocity tracking error ||v_target - v_actual||,
+        # with v_actual derived from recorded positions (central difference).
+        actual_velocity = _position_velocity(rows)
+        velocity_axes.plot(
             times,
-            [row["target_speed_mps"] for row in rows],
-            linestyle="--",
-            label=vehicle_id + " target",
+            [
+                hypot(row["target_vx_mps"] - vax, row["target_vy_mps"] - vay)
+                for row, (vax, vay) in zip(rows, actual_velocity)
+            ],
+            label=vehicle_id,
         )
-    edge_rows = bearing_edges or defaultdict(list)
+
     for (source_id, target_id), rows in sorted(edge_rows.items()):
         error_axes.plot(
             [row["time_s"] for row in rows],
             [row["bearing_error_deg"] for row in rows],
             label=source_id + "->" + target_id,
         )
+
+    overall_t, overall_rms = _overall_formation_error(edge_rows)
+    if overall_t:
+        formation_axes.plot(overall_t, overall_rms, color="black", linewidth=1.5)
+        formation_axes.axhline(5.0, color="gray", linestyle="--", alpha=0.6, label="5 deg ref")
+        formation_axes.legend(loc="best")
+
     trajectory_axes.set_title("2D trajectory")
     trajectory_axes.set_xlabel("x (m)")
     trajectory_axes.set_ylabel("y (m)")
@@ -162,10 +239,13 @@ def _plot(
     error_axes.set_title("Directed-edge bearing angle error")
     error_axes.set_xlabel("time (s)")
     error_axes.set_ylabel("error (deg)")
-    speed_axes.set_title("Speed tracking")
-    speed_axes.set_xlabel("time (s)")
-    speed_axes.set_ylabel("speed (m/s)")
-    for axes_item in axes:
+    formation_axes.set_title("Overall formation bearing error (RMS over edges)")
+    formation_axes.set_xlabel("time (s)")
+    formation_axes.set_ylabel("error (deg)")
+    velocity_axes.set_title("Desired-velocity tracking error ||v* - v|| (v from positions)")
+    velocity_axes.set_xlabel("time (s)")
+    velocity_axes.set_ylabel("error (m/s)")
+    for axes_item in (trajectory_axes, error_axes, formation_axes, velocity_axes):
         axes_item.grid(True, linestyle="--", alpha=0.4)
         handles, labels = axes_item.get_legend_handles_labels()
         if handles:

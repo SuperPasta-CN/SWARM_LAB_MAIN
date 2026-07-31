@@ -8,6 +8,7 @@ from swarm.algorithms.bearing import (
     BearingOnlyFormationController,
     build_topology_from_matrices,
 )
+from swarm.algorithms.constant_velocity import ConstantVelocityPlanner
 from swarm.application.interfaces import SwarmPlanner
 from swarm.domain.config import ExperimentConfig
 
@@ -30,9 +31,19 @@ def _build_bearing_planner(config: ExperimentConfig) -> SwarmPlanner:
     )
 
 
+def _build_constant_velocity_planner(config: ExperimentConfig) -> SwarmPlanner:
+    return ConstantVelocityPlanner(
+        vehicle_ids=config.vehicle_ids,
+        velocity=(config.constant_velocity.vx_mps, config.constant_velocity.vy_mps),
+        duration_s=config.constant_velocity.duration_s,
+        command_speed_limit_mps=config.runtime.command_speed_limit_mps,
+    )
+
+
 # Each selectable planner has one builder registered under its config value.
 _PLANNER_BUILDERS: Dict[str, PlannerBuilder] = {
     "bearing": _build_bearing_planner,
+    "constant_velocity": _build_constant_velocity_planner,
 }
 
 

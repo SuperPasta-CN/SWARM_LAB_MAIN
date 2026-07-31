@@ -1,0 +1,108 @@
+{
+  "bearing_error_metric": "directed_edge_angular_error_3d",
+  "vehicles": {
+    "car1": {
+      "samples": 90,
+      "duration_s": 18.009989,
+      "path_length_m": 1.2353562014788804,
+      "speed_rmse_mps": 0.046754238848221906,
+      "velocity_rmse_mps": 0.11241691008605834,
+      "send_success_rate": 1.0
+    },
+    "car4": {
+      "samples": 90,
+      "duration_s": 18.009989,
+      "path_length_m": 1.19560074121558,
+      "speed_rmse_mps": 0.06110184267331589,
+      "velocity_rmse_mps": 0.06952161077483336,
+      "send_success_rate": 1.0
+    },
+    "car6": {
+      "samples": 90,
+      "duration_s": 18.009989,
+      "path_length_m": 1.0272150020425355,
+      "speed_rmse_mps": 0.03822469227562077,
+      "velocity_rmse_mps": 0.05637616327815873,
+      "send_success_rate": 1.0
+    }
+  },
+  "bearing_edges": {
+    "car1->car4": {
+      "samples": 90,
+      "valid_samples": 90,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.06113048782222222,
+      "rms_error_rad": 0.09384220879635428,
+      "max_error_rad": 0.369764728,
+      "mean_error_deg": 3.502518951789208,
+      "rms_error_deg": 5.37676250421655,
+      "max_error_deg": 21.185958327202858
+    },
+    "car1->car6": {
+      "samples": 90,
+      "valid_samples": 90,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.07813153572222223,
+      "rms_error_rad": 0.12303657328066549,
+      "max_error_rad": 0.407089219,
+      "mean_error_deg": 4.47660724375896,
+      "rms_error_deg": 7.049476374734206,
+      "max_error_deg": 23.324494133976884
+    },
+    "car4->car1": {
+      "samples": 90,
+      "valid_samples": 90,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.06113048782222222,
+      "rms_error_rad": 0.09384220879635428,
+      "max_error_rad": 0.369764728,
+      "mean_error_deg": 3.502518951789208,
+      "rms_error_deg": 5.37676250421655,
+      "max_error_deg": 21.185958327202858
+    },
+    "car4->car6": {
+      "samples": 90,
+      "valid_samples": 90,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.03837927564444445,
+      "rms_error_rad": 0.04593168025590563,
+      "max_error_rad": 0.156515193,
+      "mean_error_deg": 2.1989705151958994,
+      "rms_error_deg": 2.631691424607766,
+      "max_error_deg": 8.967659988575525
+    },
+    "car6->car1": {
+      "samples": 90,
+      "valid_samples": 90,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.07813153572222223,
+      "rms_error_rad": 0.12303657328066549,
+      "max_error_rad": 0.407089219,
+      "mean_error_deg": 4.47660724375896,
+      "rms_error_deg": 7.049476374734206,
+      "max_error_deg": 23.324494133976884
+    },
+    "car6->car4": {
+      "samples": 90,
+      "valid_samples": 90,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.03837927564444445,
+      "rms_error_rad": 0.04593168025590563,
+      "max_error_rad": 0.156515193,
+      "mean_error_deg": 2.1989705151958994,
+      "rms_error_deg": 2.631691424607766,
+      "max_error_deg": 8.967659988575525
+    }
+  },
+  "bearing_global": {
+    "samples": 540,
+    "valid_samples": 540,
+    "invalid_samples": 0,
+    "mean_error_rad": 0.059213766396296295,
+    "rms_error_rad": 0.0931916980700854,
+    "max_error_rad": 0.407089219,
+    "mean_error_deg": 3.3926989035813557,
+    "rms_error_deg": 5.339490985073352,
+    "max_error_deg": 23.324494133976884
+  }
+}

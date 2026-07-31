@@ -64,18 +64,33 @@ class ObstacleAvoidanceConfig:
 
 
 @dataclass(frozen=True)
-class ExecutionConfig:
-    """Velocity-to-wheel mapping shared by omni (mecanum) and diff modes."""
+class ConstantVelocityConfig:
+    """Fixed world-frame velocity step for chassis tracking tests.
 
-    mode: str = "omni"  # "omni" (mecanum holonomic) or "diff" (differential)
+    Used by ``algorithm="constant_velocity"`` (see configs/chassis_step.py):
+    every vehicle is commanded (vx_mps, vy_mps) for ``duration_s`` seconds.
+    """
+
+    vx_mps: float = 0.0
+    vy_mps: float = 0.0
+    duration_s: float = 5.0
+
+
+@dataclass(frozen=True)
+class ExecutionConfig:
+    """Velocity-to-wheel mapping shared by omni / omni_pid / diff modes."""
+
+    mode: str = "omni"  # "omni" (open-loop mecanum), "omni_pid" (mecanum + velocity PI), "diff" (differential)
     heading_hold: bool = True
     k_omega: float = 2.0
     omega_max: float = 1.5
     mecanum_l_m: float = 0.10  # lx + ly of the X-pattern mecanum chassis
     # Wheel-speed <-> command calibration: command 100 corresponds to this
-    # wheel speed (m/s).  Measure it (full command for 2 s, distance / time);
-    # 0.3 matches the lab fleet, 0.5 systematically under-drives the motors.
-    max_wheel_speed_mps: float = 0.3
+    # wheel speed (m/s).  Measure it (full command for 2 s, distance / time).
+    # 0.5 is an estimate from the 2026-07-31 open-loop chassis_step run
+    # (target 0.15 m/s, actual ~0.257 m/s with the old 0.3 value); refine
+    # with a dedicated calibration run when possible.
+    max_wheel_speed_mps: float = 0.5
     wheel_command_min: float = -100.0
     wheel_command_max: float = 100.0
     # Motor dead-zone compensation: nonzero wheel commands smaller than this
@@ -90,6 +105,13 @@ class ExecutionConfig:
     )
     heading_pid: PIDConfig = field(
         default_factory=lambda: PIDConfig(3.2, 0.0, 0.0, 1.0, 11.32)
+    )
+    # omni_pid mode only: feedforward + PI correction on the mocap-estimated
+    # body velocity (position difference + EMA, so keep kd = 0).  Error and
+    # correction are both in m/s.  Conservative on-site starting points;
+    # tune with the chassis_step experiment before any formation run.
+    omni_velocity_pid: PIDConfig = field(
+        default_factory=lambda: PIDConfig(0.6, 1.2, 0.0, 0.10, 0.15)
     )
 
 
@@ -138,6 +160,14 @@ class RuntimeConfig:
     # ROS2 vrpn_client_ros publishes directly to /{name}/pose, no prefix needed
     mocap_prefix: str = ""
     require_twist: bool = False
+    # Velocity estimates above this speed are rejected as mocap glitches
+    # (pose-only finite-difference mode; the fleet tops out near 0.3 m/s).
+    max_plausible_speed_mps: float = 1.0
+    # Baseline window for the pose finite-difference velocity estimate: the
+    # raw difference is taken against the oldest sample inside this trailing
+    # window, so position noise / dt stays below the glitch threshold even
+    # at high mocap rates.  Larger is smoother but adds feedback lag.
+    velocity_diff_baseline_s: float = 0.2
     stop_on_loss_of_mocap: bool = True
     udp_port: int = 12345
     udp_timeout_s: float = 0.2
@@ -161,6 +191,7 @@ class ExperimentConfig:
     preflight: PreflightConfig = field(default_factory=PreflightConfig)
     obstacle_avoidance: ObstacleAvoidanceConfig = field(default_factory=ObstacleAvoidanceConfig)
     static_obstacles: Tuple[StaticObstacleConfig, ...] = ()
+    constant_velocity: ConstantVelocityConfig = field(default_factory=ConstantVelocityConfig)
 
     @property
     def vehicle_ids(self) -> Tuple[str, ...]:
@@ -191,6 +222,10 @@ class ExperimentConfig:
                     raise ValueError("missing target velocity for leader: %s" % vehicle.vehicle_id)
         if self.runtime.control_hz <= 0.0:
             raise ValueError("control_hz must be positive")
+        if self.runtime.max_plausible_speed_mps <= 0.0:
+            raise ValueError("max_plausible_speed_mps must be positive")
+        if self.runtime.velocity_diff_baseline_s <= 0.0:
+            raise ValueError("velocity_diff_baseline_s must be positive")
         if self.runtime.command_speed_limit_mps <= 0.0:
             raise ValueError("command_speed_limit_mps must be positive")
         if self.bearing_control.kp <= 0.0:
@@ -198,8 +233,15 @@ class ExperimentConfig:
         if self.bearing_control.deadband_mps < 0.0:
             raise ValueError("bearing deadband_mps must be non-negative")
         execution = self.execution
-        if execution.mode not in ("omni", "diff"):
-            raise ValueError("execution.mode must be 'omni' or 'diff'")
+        if execution.mode not in ("omni", "omni_pid", "diff"):
+            raise ValueError("execution.mode must be 'omni', 'omni_pid' or 'diff'")
+        velocity_pid = execution.omni_velocity_pid
+        if velocity_pid.kp < 0.0 or velocity_pid.ki < 0.0 or velocity_pid.kd < 0.0:
+            raise ValueError("omni_velocity_pid gains must be non-negative")
+        if velocity_pid.integral_limit <= 0.0:
+            raise ValueError("omni_velocity_pid integral_limit must be positive")
+        if velocity_pid.output_limit <= 0.0:
+            raise ValueError("omni_velocity_pid output_limit must be positive")
         if execution.mecanum_l_m <= 0.0:
             raise ValueError("mecanum_l_m must be positive")
         if execution.max_wheel_speed_mps <= 0.0:
@@ -248,3 +290,11 @@ class ExperimentConfig:
                 raise ValueError("static obstacle ID must not be empty")
             if obstacle.radius_m < 0.0:
                 raise ValueError("static obstacle radius_m must be non-negative")
+        constant = self.constant_velocity
+        if constant.duration_s <= 0.0:
+            raise ValueError("constant_velocity duration_s must be positive")
+        constant_speed = (constant.vx_mps ** 2 + constant.vy_mps ** 2) ** 0.5
+        if constant_speed > self.runtime.command_speed_limit_mps:
+            raise ValueError(
+                "constant_velocity speed must not exceed command_speed_limit_mps"
+            )

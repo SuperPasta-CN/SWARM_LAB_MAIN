@@ -1,0 +1,160 @@
+{
+  "bearing_error_metric": "directed_edge_angular_error_3d",
+  "vehicles": {
+    "car1": {
+      "samples": 283,
+      "duration_s": 56.986747,
+      "path_length_m": 1.978043214584729,
+      "speed_rmse_mps": 0.043649738100512626,
+      "velocity_rmse_mps": 0.09500877706768027,
+      "send_success_rate": 1.0
+    },
+    "car2": {
+      "samples": 283,
+      "duration_s": 56.986747,
+      "path_length_m": 1.0519024415475113,
+      "speed_rmse_mps": 0.049033602015068366,
+      "velocity_rmse_mps": 0.051646538310521094,
+      "send_success_rate": 1.0
+    },
+    "car3": {
+      "samples": 283,
+      "duration_s": 56.986747,
+      "path_length_m": 2.7439887345896974,
+      "speed_rmse_mps": 0.03447552127321312,
+      "velocity_rmse_mps": 0.04820942539937692,
+      "send_success_rate": 1.0
+    },
+    "car4": {
+      "samples": 283,
+      "duration_s": 56.986747,
+      "path_length_m": 1.3921142293255677,
+      "speed_rmse_mps": 0.03777149511321476,
+      "velocity_rmse_mps": 0.04375151679381175,
+      "send_success_rate": 1.0
+    }
+  },
+  "bearing_edges": {
+    "car1->car2": {
+      "samples": 283,
+      "valid_samples": 283,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.04230532045229682,
+      "rms_error_rad": 0.053393388680281394,
+      "max_error_rad": 0.148639066,
+      "mean_error_deg": 2.4239163128650905,
+      "rms_error_deg": 3.0592158252817083,
+      "max_error_deg": 8.51639115256649
+    },
+    "car1->car3": {
+      "samples": 283,
+      "valid_samples": 283,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.05107194711660777,
+      "rms_error_rad": 0.10057428899155395,
+      "max_error_rad": 0.595410894,
+      "mean_error_deg": 2.9262070212969595,
+      "rms_error_deg": 5.762482286745097,
+      "max_error_deg": 34.114531302311235
+    },
+    "car1->car4": {
+      "samples": 283,
+      "valid_samples": 283,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.09298796760424027,
+      "rms_error_rad": 0.10627408916135017,
+      "max_error_rad": 0.429043014,
+      "mean_error_deg": 5.327818089222193,
+      "rms_error_deg": 6.089056780542371,
+      "max_error_deg": 24.582353931772293
+    },
+    "car2->car1": {
+      "samples": 283,
+      "valid_samples": 283,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.04230532045229682,
+      "rms_error_rad": 0.053393388680281394,
+      "max_error_rad": 0.148639066,
+      "mean_error_deg": 2.4239163128650905,
+      "rms_error_deg": 3.0592158252817083,
+      "max_error_deg": 8.51639115256649
+    },
+    "car2->car4": {
+      "samples": 283,
+      "valid_samples": 283,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.09164007639575972,
+      "rms_error_rad": 0.123397878604198,
+      "max_error_rad": 0.75667421,
+      "mean_error_deg": 5.250589611733469,
+      "rms_error_deg": 7.070177644888227,
+      "max_error_deg": 43.35423869939575
+    },
+    "car3->car1": {
+      "samples": 283,
+      "valid_samples": 283,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.05107194711660777,
+      "rms_error_rad": 0.10057428899155395,
+      "max_error_rad": 0.595410894,
+      "mean_error_deg": 2.9262070212969595,
+      "rms_error_deg": 5.762482286745097,
+      "max_error_deg": 34.114531302311235
+    },
+    "car3->car4": {
+      "samples": 283,
+      "valid_samples": 283,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.014335535466431093,
+      "rms_error_rad": 0.017568646573989377,
+      "max_error_rad": 0.06546045,
+      "mean_error_deg": 0.8213656792866076,
+      "rms_error_deg": 1.0066093004465646,
+      "max_error_deg": 3.75060751002715
+    },
+    "car4->car1": {
+      "samples": 283,
+      "valid_samples": 283,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.09298796760424027,
+      "rms_error_rad": 0.10627408916135017,
+      "max_error_rad": 0.429043014,
+      "mean_error_deg": 5.327818089222193,
+      "rms_error_deg": 6.089056780542371,
+      "max_error_deg": 24.582353931772293
+    },
+    "car4->car2": {
+      "samples": 283,
+      "valid_samples": 283,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.09164007639575972,
+      "rms_error_rad": 0.123397878604198,
+      "max_error_rad": 0.75667421,
+      "mean_error_deg": 5.250589611733469,
+      "rms_error_deg": 7.070177644888227,
+      "max_error_deg": 43.35423869939575
+    },
+    "car4->car3": {
+      "samples": 283,
+      "valid_samples": 283,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.014335535466431093,
+      "rms_error_rad": 0.017568646573989377,
+      "max_error_rad": 0.06546045,
+      "mean_error_deg": 0.8213656792866076,
+      "rms_error_deg": 1.0066093004465646,
+      "max_error_deg": 3.75060751002715
+    }
+  },
+  "bearing_global": {
+    "samples": 2830,
+    "valid_samples": 2830,
+    "invalid_samples": 0,
+    "mean_error_rad": 0.05846816940706714,
+    "rms_error_rad": 0.08921425600704515,
+    "max_error_rad": 0.75667421,
+    "mean_error_deg": 3.349979342880864,
+    "rms_error_deg": 5.111600341603339,
+    "max_error_deg": 43.35423869939575
+  }
+}

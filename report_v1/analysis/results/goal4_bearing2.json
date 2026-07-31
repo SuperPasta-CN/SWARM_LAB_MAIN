@@ -1,0 +1,146 @@
+{
+  "bearing_2_jyc1": {
+    "morphology": {
+      "n_increases": 18,
+      "n_samples": 74,
+      "increase_frac": 0.2465753424657534,
+      "last3s_slope_deg_per_s": 0.25084831432873594
+    },
+    "steady_rms_deg": 1.1802712800000001,
+    "tau_s": 1.9990973297541013,
+    "amplitude_deg": 114.35224869101943,
+    "initial_geometry": {
+      "car1-car6": {
+        "initial_distance_m": 0.9803053128168795,
+        "initial_offset_deg": 71.98832330654756,
+        "initial_error_deg": 71.98833
+      }
+    },
+    "mean_decomposition": {
+      "split_s": 5.0,
+      "whole_mean_deg": 15.605940135135134,
+      "first5s_mean_deg": 43.59611232,
+      "after5s_mean_deg": 1.3252400408163265
+    },
+    "movement": {
+      "car1": {
+        "displacement_first6s_m": 0.4495850881257073,
+        "path_length_m": 0.6596783533358137
+      },
+      "car6": {
+        "displacement_first6s_m": 1.1856702668402375,
+        "path_length_m": 1.6370118004522691
+      }
+    }
+  },
+  "bearing_3_jyc10": {
+    "morphology": {
+      "n_increases": 34,
+      "n_samples": 90,
+      "increase_frac": 0.38202247191011235,
+      "last3s_slope_deg_per_s": -0.08828688676299645
+    },
+    "steady_rms_deg": 2.6706657410912173,
+    "tau_s": 5.557736540669316,
+    "amplitude_deg": 7.096001932675091,
+    "initial_geometry": {
+      "car1-car4": {
+        "initial_distance_m": 1.035071615547446,
+        "initial_offset_deg": 21.18436638228821,
+        "initial_error_deg": 21.184314
+      },
+      "car1-car6": {
+        "initial_distance_m": 0.892154213110043,
+        "initial_offset_deg": -23.323175911039332,
+        "initial_error_deg": 23.323223
+      },
+      "car4-car6": {
+        "initial_distance_m": 0.7567290021573112,
+        "initial_offset_deg": 8.96116481719948,
+        "initial_error_deg": 8.961112
+      }
+    },
+    "mean_decomposition": {
+      "split_s": 5.0,
+      "whole_mean_deg": 3.8278487362374145,
+      "first5s_mean_deg": 7.375799312233284,
+      "after5s_mean_deg": 2.463252360854387
+    },
+    "movement": {
+      "car1": {
+        "displacement_first6s_m": 0.6037004002094085,
+        "path_length_m": 1.2353562014788804
+      },
+      "car4": {
+        "displacement_first6s_m": 0.13329796289891305,
+        "path_length_m": 1.19560074121558
+      },
+      "car6": {
+        "displacement_first6s_m": 0.3152880831065456,
+        "path_length_m": 1.0272150020425355
+      }
+    }
+  },
+  "bearing_4_jyc1": {
+    "morphology": {
+      "n_increases": 42,
+      "n_samples": 283,
+      "increase_frac": 0.14893617021276595,
+      "last3s_slope_deg_per_s": 0.013103169058619473
+    },
+    "steady_rms_deg": 3.553181406155076,
+    "tau_s": 6.4449308100179,
+    "amplitude_deg": 8.87783267419994,
+    "initial_geometry": {
+      "car1-car2": {
+        "initial_distance_m": 1.9340596343021588,
+        "initial_offset_deg": -6.84874201993008,
+        "initial_error_deg": 6.848738
+      },
+      "car1-car3": {
+        "initial_distance_m": 1.3277834666134385,
+        "initial_offset_deg": 34.114530567745305,
+        "initial_error_deg": 34.114531
+      },
+      "car1-car4": {
+        "initial_distance_m": 2.801096244812913,
+        "initial_offset_deg": 24.58234056669488,
+        "initial_error_deg": 24.582354
+      },
+      "car2-car4": {
+        "initial_distance_m": 1.0267296289335377,
+        "initial_offset_deg": 43.35423377299005,
+        "initial_error_deg": 43.354239
+      },
+      "car3-car4": {
+        "initial_distance_m": 1.8843901208372433,
+        "initial_offset_deg": 3.715202809260338,
+        "initial_error_deg": 3.71523
+      }
+    },
+    "mean_decomposition": {
+      "split_s": 5.0,
+      "whole_mean_deg": 4.011314027144123,
+      "first5s_mean_deg": 10.887533120261098,
+      "after5s_mean_deg": 3.3450137274234852
+    },
+    "movement": {
+      "car1": {
+        "displacement_first6s_m": 0.6192572122026517,
+        "path_length_m": 1.978043214584729
+      },
+      "car2": {
+        "displacement_first6s_m": 0.5571623045863745,
+        "path_length_m": 1.0519024415475113
+      },
+      "car3": {
+        "displacement_first6s_m": 0.6602347506251092,
+        "path_length_m": 2.7439887345896974
+      },
+      "car4": {
+        "displacement_first6s_m": 0.7280176039664151,
+        "path_length_m": 1.3921142293255677
+      }
+    }
+  }
+}

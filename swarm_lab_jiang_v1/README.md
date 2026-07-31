@@ -26,13 +26,16 @@ swarm_lab_jiang_v1/
 ├── run_experiment.py           # 入口：--config/--yes/--no-plot/--no-record
 ├── configs/                    # 四个实验拓扑（矩阵/leader_mask/IP 与旧工程一致）
 │   ├── bearing_two.py  bearing_three.py  bearing_four.py  bearing_six.py
+│   └── chassis_step.py         # 单车恒速阶跃测试（底盘运动学三方对比）
 ├── swarm/
 │   ├── domain/                 # models.py（数据结构） config.py（类型化配置）
 │   ├── algorithms/
 │   │   ├── pid.py              # PID + VectorPIController（差速模式内部使用）
 │   │   ├── bearing.py          # 新控制律：P 投影 + 求和 + 平滑饱和 + 死区
-│   │   ├── mecanum.py          # 麦轮全向映射 + 航向保持
+│   │   ├── mecanum.py          # 麦轮全向映射 + 航向保持（平移开环）
+│   │   ├── mecanum_pid.py      # 麦轮全向 + 车体速度前馈/PI 闭环（omni_pid）
 │   │   ├── differential.py     # 差速模式（旧 vehicle.py 移植）
+│   │   ├── constant_velocity.py # 恒速阶跃 planner（底盘层残差测试输入）
 │   │   └── obstacle_avoidance.py  # APF 人工势场过滤器
 │   ├── application/
 │   │   ├── control_loop.py     # 50 Hz 主循环，mocap 丢失停车，可选收敛停车
@@ -56,7 +59,7 @@ swarm_lab_jiang_v1/
 | 控制律 | 逐边误差求**均值** + 向量 PI，无投影 | `Σ P_ij(g−g*)` 求和，P=I−g·gᵀ，tanh 平滑饱和 + 死区 |
 | 运动模式 | leader 钉死、follower 跟随 | 默认 `all_bearing` **全员运动**（无静止锚点），另有 `leader_velocity`（旧行为）与 `leader_bias`（编队机动）可选 |
 | bearing 维度 | 3D（含 z 噪声） | 默认 2D，`bearing_3d=True` 可切回 |
-| 执行器 | 差速转向单车模型（航向PID+速度PID） | 默认麦轮全向（世界系→车体系→X 型逆运动学），差速可配置 |
+| 执行器 | 差速转向单车模型（航向PID+速度PID） | 默认麦轮全向开环（世界系→车体系→X 型逆运动学）；`omni_pid` 麦轮速度 PI 闭环与差速双 PID 可配置，三方对比见"后处理"节 |
 | 航向 | 差速转向即航向 | 航向保持 P 控制（解锁时锁定各车初始 yaw） |
 | 起飞检查 | 无 | preflight：mocap 有效 / 锚定边夹角 ≤ 20° / 车距 ≥ 0.20 m / 逐边误差表 + 确认 |
 | UDP | 每条指令新建 socket | 持久 socket + 发送锁，报文格式不变 `<FL,FR,RL,RR>` |
@@ -138,7 +141,18 @@ python -m unittest discover -s tests -v
    ```
 
    生成 `analysis.json`（逐边/全局 bearing 误差统计、轨迹长度、速度 RMSE、
-   发送成功率）和 `analysis.png`（轨迹 + 逐边误差 + 速度跟踪）。
+   逐车速度跟踪 RMSE、发送成功率）和 `analysis.png`（2×2：轨迹、逐边
+   bearing 误差、**整体构型 bearing RMS 误差**、**逐车期望速度跟踪误差**；
+   实际速度由记录位置做 0.4 s 中心差分得到，比动捕差分速度干净）。
+
+   底盘运动学三方对比（omni / omni_pid / diff 各跑一遍 `chassis_step` 后）：
+
+   ```
+   python ../report_v1/chassis_comparison/postprocess_chassis.py runs/
+   ```
+
+   输出各运行稳态窗口内的速度残差（绝对/相对/方向差/RMSE）与对比表，
+   口径与 tools/postprocess.py 一致；稳态窗口可用 --t-start/--t-end 指定。
 
 ## 调参指南
 
@@ -151,7 +165,8 @@ python -m unittest discover -s tests -v
 | `bearing_control.deadband_mps` | 0.015 | 死区。收敛后微抖可略加大；过大留残差（残差角 ≈ deadband/kp 弧度量级） |
 | `bearing_control.bearing_3d` | False | 默认忽略 z；确需 3D 再开 |
 | `runtime.command_speed_limit_mps` | 0.25 | 平滑饱和上限（tanh），也是 APF/leader 限速 |
-| `execution.mode` | `"omni"` | `"diff"` 切回旧差速模式做 A/B 对比 |
+| `execution.mode` | `"omni"` | 三种底盘运动学：`"omni"` 麦轮开环（默认）/ `"omni_pid"` 麦轮+车体速度 PI 闭环 / `"diff"` 旧差速双 PID |
+| `execution.omni_velocity_pid` | (0.6, 1.2, 0, 0.10, 0.15) | omni_pid 的车体速度 PI（kp, ki, kd, 积分限幅, 输出限幅）；误差与修正量单位 m/s；反馈为位置差分+EMA，kd 保持 0；先用 `chassis_step` 现场整定再进编队实验 |
 | `execution.heading_hold` | True | 航向保持；关闭则 ω=0（平移时车头会随阻力漂移） |
 | `execution.k_omega` / `omega_max` | 2.0 / 1.5 | 航向保持增益与角速度上限（rad/s） |
 | `execution.mecanum_l_m` | 0.10 | 轮距参数 lx+ly（m），按实车量 |
@@ -162,6 +177,7 @@ python -m unittest discover -s tests -v
 | `preflight.min_separation_m` | 0.20 | 最小车距硬校验 |
 | `runtime.stop_on_converge` / `converge_eps_rad` | False / 0.05 | 收敛自动停车（mean bearing 角误差，持续 3 s） |
 | `runtime.require_twist` | False | True 恢复旧行为：pose+twist 都到才 valid（diff 模式速度 PID 需要实测速度时更准） |
+| `runtime.max_plausible_speed_mps` | 1.0 | 动捕速度估计的物理上限：差分速度超过即判为动捕跳变并丢弃（车队实际 ≤0.3 m/s） |
 
 典型顺序：先 `check_wheels` 排除硬件 → 单车 omni 平移/旋转方向正确 →
 两车（bearing_two）→ 四车（bearing_four）→ 六车（bearing_six）。

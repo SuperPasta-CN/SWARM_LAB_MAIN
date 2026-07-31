@@ -1,0 +1,377 @@
+{
+  "bearing_2_jyc1": {
+    "signed_edges": {
+      "car1-car6": {
+        "signed_mean_deg": -1.1802712670486555,
+        "signed_std_deg": 0.2480410633069852,
+        "unsigned_mean_deg": 1.1802712670486555
+      }
+    },
+    "shape_fit": {
+      "rotation_deg": -1.179535992244036,
+      "scale": 1.0,
+      "fit_rms_mm": 0.0,
+      "per_vehicle": {
+        "car1": {
+          "residual_mm": 0.0,
+          "residual_x_mm": 0.0,
+          "residual_y_mm": 0.0,
+          "actual": [
+            0.66582644,
+            -0.38004868
+          ],
+          "desired_fitted": [
+            0.66582644,
+            -0.38004868
+          ]
+        },
+        "car6": {
+          "residual_mm": 0.0,
+          "residual_x_mm": 0.0,
+          "residual_y_mm": 0.0,
+          "actual": [
+            0.6908418000000001,
+            0.83489692
+          ],
+          "desired_fitted": [
+            0.6908418000000001,
+            0.83489692
+          ]
+        }
+      }
+    },
+    "velocity": {
+      "car1": {
+        "steady_rmse_mps": 0.014343425991421507,
+        "steady_mean_target_mps": 0.0032162722800756576,
+        "steady_mean_actual_mps": 0.009425357098348724,
+        "transient_peak_err_mps": 0.3414182470103455,
+        "active_ratio_actual_over_target": 0.4234111531094469,
+        "whole_run_rmse_mps": 0.14685391892985422
+      },
+      "car6": {
+        "steady_rmse_mps": 0.028576860237912536,
+        "steady_mean_target_mps": 0.0032162722800756576,
+        "steady_mean_actual_mps": 0.024080339127635752,
+        "transient_peak_err_mps": 0.23382283858168498,
+        "active_ratio_actual_over_target": 1.0939785665301325,
+        "whole_run_rmse_mps": 0.07593856294520963
+      }
+    },
+    "heading": {
+      "car1": {
+        "mean_offset_deg": 0.12610113521474847,
+        "std_deg": 8.856563569682866,
+        "peak_to_peak_deg": 33.488237209806364
+      },
+      "car6": {
+        "mean_offset_deg": -0.8928470076459087,
+        "std_deg": 13.382144919605032,
+        "peak_to_peak_deg": 43.858314935438145
+      }
+    },
+    "dither": {
+      "car1": {
+        "sigma_x_mm": 5.487414838191115,
+        "sigma_y_mm": 9.78585668286635,
+        "sigma_pos_mm": 7.933306770319676
+      },
+      "car6": {
+        "sigma_x_mm": 5.778298926154649,
+        "sigma_y_mm": 12.51516365348852,
+        "sigma_pos_mm": 9.74725755670794
+      }
+    }
+  },
+  "bearing_3_jyc10": {
+    "signed_edges": {
+      "car1-car4": {
+        "signed_mean_deg": -2.3683921413289255,
+        "signed_std_deg": 1.158316320475836,
+        "unsigned_mean_deg": 2.3683921413289255
+      },
+      "car1-car6": {
+        "signed_mean_deg": -2.5471218319389153,
+        "signed_std_deg": 1.4883982460940948,
+        "unsigned_mean_deg": 2.636883252798437
+      },
+      "car4-car6": {
+        "signed_mean_deg": 2.380703639801885,
+        "signed_std_deg": 0.7246008787040992,
+        "unsigned_mean_deg": 2.380703639801885
+      }
+    },
+    "shape_fit": {
+      "rotation_deg": 0.6056876379071261,
+      "scale": 1.0071305951767069,
+      "fit_rms_mm": 10.143301173954072,
+      "per_vehicle": {
+        "car1": {
+          "residual_mm": 12.503021171311085,
+          "residual_x_mm": -11.21661989066891,
+          "residual_y_mm": 5.523855233304342,
+          "actual": [
+            0.6913272,
+            0.95849128
+          ],
+          "desired_fitted": [
+            0.7025438198906689,
+            0.9529674247666956
+          ]
+        },
+        "car4": {
+          "residual_mm": 8.272534173183296,
+          "residual_x_mm": 7.730083448783676,
+          "residual_y_mm": 2.946291146734503,
+          "actual": [
+            1.20729896,
+            0.93701572
+          ],
+          "desired_fitted": [
+            1.1995688765512162,
+            0.9340694288532655
+          ]
+        },
+        "car6": {
+          "residual_mm": 9.159656983745379,
+          "residual_x_mm": 3.486536441885013,
+          "residual_y_mm": -8.470146380038734,
+          "actual": [
+            0.71126948,
+            1.39367872
+          ],
+          "desired_fitted": [
+            0.707782943558115,
+            1.4021488663800388
+          ]
+        }
+      }
+    },
+    "velocity": {
+      "car1": {
+        "steady_rmse_mps": 0.08575197011581774,
+        "steady_mean_target_mps": 0.038941859848861116,
+        "steady_mean_actual_mps": 0.05388279229977453,
+        "transient_peak_err_mps": 0.3235905428459677,
+        "active_ratio_actual_over_target": 1.2882973140693699,
+        "whole_run_rmse_mps": 0.11241691008605834
+      },
+      "car4": {
+        "steady_rmse_mps": 0.061875110773918926,
+        "steady_mean_target_mps": 0.021572966937585144,
+        "steady_mean_actual_mps": 0.05449978904719826,
+        "transient_peak_err_mps": 0.2014371177384688,
+        "active_ratio_actual_over_target": 1.3834134899795183,
+        "whole_run_rmse_mps": 0.06952161077483336
+      },
+      "car6": {
+        "steady_rmse_mps": 0.04848000191798998,
+        "steady_mean_target_mps": 0.028296891826377804,
+        "steady_mean_actual_mps": 0.03552635887242021,
+        "transient_peak_err_mps": 0.18409600294376022,
+        "active_ratio_actual_over_target": 0.6182747088514076,
+        "whole_run_rmse_mps": 0.05637616327815873
+      }
+    },
+    "heading": {
+      "car1": {
+        "mean_offset_deg": 8.867715923694552,
+        "std_deg": 7.6111581476106425,
+        "peak_to_peak_deg": 29.148482982146962
+      },
+      "car4": {
+        "mean_offset_deg": -1.3272934017194422,
+        "std_deg": 6.751607877639191,
+        "peak_to_peak_deg": 28.65986457445939
+      },
+      "car6": {
+        "mean_offset_deg": -0.39586112431824205,
+        "std_deg": 20.108999188849833,
+        "peak_to_peak_deg": 76.59036244723085
+      }
+    },
+    "dither": {
+      "car1": {
+        "sigma_x_mm": 29.986139955652856,
+        "sigma_y_mm": 60.1284697683352,
+        "sigma_pos_mm": 47.5110590606103
+      },
+      "car4": {
+        "sigma_x_mm": 17.728119854017237,
+        "sigma_y_mm": 63.2578425028992,
+        "sigma_pos_mm": 46.45342221882044
+      },
+      "car6": {
+        "sigma_x_mm": 23.502096480305738,
+        "sigma_y_mm": 24.01430082183531,
+        "sigma_pos_mm": 23.759578941252297
+      }
+    }
+  },
+  "bearing_4_jyc1": {
+    "signed_edges": {
+      "car1-car2": {
+        "signed_mean_deg": 0.7809560699386079,
+        "signed_std_deg": 0.011801302473605417,
+        "unsigned_mean_deg": 0.7809560699386079
+      },
+      "car1-car3": {
+        "signed_mean_deg": 2.158098250897391,
+        "signed_std_deg": 0.14778284477233417,
+        "unsigned_mean_deg": 2.158098250897391
+      },
+      "car1-car4": {
+        "signed_mean_deg": -5.484546493868631,
+        "signed_std_deg": 0.002036994646845862,
+        "unsigned_mean_deg": 5.484546493868631
+      },
+      "car2-car4": {
+        "signed_mean_deg": 5.2104953788736115,
+        "signed_std_deg": 0.02071942954771718,
+        "unsigned_mean_deg": 5.2104953788736115
+      },
+      "car3-car4": {
+        "signed_mean_deg": 0.7166362278414732,
+        "signed_std_deg": 0.30910217105611554,
+        "unsigned_mean_deg": 0.7166362278414732
+      }
+    },
+    "shape_fit": {
+      "rotation_deg": 0.07299888342223593,
+      "scale": 0.9867262051877336,
+      "fit_rms_mm": 63.69300524893165,
+      "per_vehicle": {
+        "car1": {
+          "residual_mm": 84.62359190663919,
+          "residual_x_mm": 56.96335655370402,
+          "residual_y_mm": 62.580574600406116,
+          "actual": [
+            0.19170108,
+            0.973663
+          ],
+          "desired_fitted": [
+            0.13473772344629598,
+            0.9110824253995938
+          ]
+        },
+        "car2": {
+          "residual_mm": 83.48893480854507,
+          "residual_x_mm": -83.40221339564602,
+          "residual_y_mm": -3.8043443814423927,
+          "actual": [
+            1.2147578,
+            0.9876084
+          ],
+          "desired_fitted": [
+            1.2981600133956461,
+            0.9914127443814424
+          ]
+        },
+        "car3": {
+          "residual_mm": 32.07265971924627,
+          "residual_x_mm": 10.313646010696925,
+          "residual_y_mm": -30.369132477444882,
+          "actual": [
+            0.24484811999999997,
+            -0.43636984
+          ],
+          "desired_fitted": [
+            0.23453447398930305,
+            -0.4060007075225551
+          ]
+        },
+        "car4": {
+          "residual_mm": 32.6647459265839,
+          "residual_x_mm": 16.12521083124485,
+          "residual_y_mm": -28.40709774151845,
+          "actual": [
+            1.34336152,
+            -0.42264516
+          ],
+          "desired_fitted": [
+            1.3272363091687551,
+            -0.39423806225848157
+          ]
+        }
+      }
+    },
+    "velocity": {
+      "car1": {
+        "steady_rmse_mps": 0.03484954322448892,
+        "steady_mean_target_mps": 0.034833937478571955,
+        "steady_mean_actual_mps": 0.00014546490265851273,
+        "transient_peak_err_mps": 0.27892103317230194,
+        "active_ratio_actual_over_target": 0.7733257042350544,
+        "whole_run_rmse_mps": 0.09500877706768027
+      },
+      "car2": {
+        "steady_rmse_mps": 0.05329179220474961,
+        "steady_mean_target_mps": 0.053625296162482156,
+        "steady_mean_actual_mps": 0.0005430308718771727,
+        "transient_peak_err_mps": 0.22720681642036988,
+        "active_ratio_actual_over_target": 0.33683268201554495,
+        "whole_run_rmse_mps": 0.051646538310521094
+      },
+      "car3": {
+        "steady_rmse_mps": 0.029515763609974068,
+        "steady_mean_target_mps": 0.023727374816606233,
+        "steady_mean_actual_mps": 0.011760287653800851,
+        "transient_peak_err_mps": 0.20185702141436632,
+        "active_ratio_actual_over_target": 1.299754728858708,
+        "whole_run_rmse_mps": 0.04820942539937692
+      },
+      "car4": {
+        "steady_rmse_mps": 0.02607547420917777,
+        "steady_mean_target_mps": 0.02592251904124107,
+        "steady_mean_actual_mps": 0.0002991147509160132,
+        "transient_peak_err_mps": 0.22036667846350969,
+        "active_ratio_actual_over_target": 1.2186665392926315,
+        "whole_run_rmse_mps": 0.04375151679381175
+      }
+    },
+    "heading": {
+      "car1": {
+        "mean_offset_deg": -5.970974237721564,
+        "std_deg": 0.08200955248522289,
+        "peak_to_peak_deg": 0.39505439974269535
+      },
+      "car2": {
+        "mean_offset_deg": -17.86115941412141,
+        "std_deg": 1.2865714869829605,
+        "peak_to_peak_deg": 4.392523640590941
+      },
+      "car3": {
+        "mean_offset_deg": 0.944064850868244,
+        "std_deg": 13.3463236472916,
+        "peak_to_peak_deg": 37.66297959246806
+      },
+      "car4": {
+        "mean_offset_deg": -5.293000154236811,
+        "std_deg": 0.15243243427065836,
+        "peak_to_peak_deg": 0.5479195394836056
+      }
+    },
+    "dither": {
+      "car1": {
+        "sigma_x_mm": 0.02985018592907277,
+        "sigma_y_mm": 0.029194520033722766,
+        "sigma_pos_mm": 0.02952417314675937
+      },
+      "car2": {
+        "sigma_x_mm": 0.4865426600001287,
+        "sigma_y_mm": 0.2111791656390406,
+        "sigma_pos_mm": 0.3750469303967186
+      },
+      "car3": {
+        "sigma_x_mm": 3.809094530935138,
+        "sigma_y_mm": 5.890178704793257,
+        "sigma_pos_mm": 4.960010399182645
+      },
+      "car4": {
+        "sigma_x_mm": 0.08390047437291127,
+        "sigma_y_mm": 0.048097135049814624,
+        "sigma_pos_mm": 0.06838356527704464
+      }
+    }
+  }
+}

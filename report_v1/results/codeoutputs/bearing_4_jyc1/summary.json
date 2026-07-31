@@ -1,0 +1,14 @@
+{
+  "recorded_frames": 283,
+  "recorded_rows": 1132,
+  "bearing_error_metric": "directed_edge_angular_error_3d",
+  "recorded_bearing_edges": 2830,
+  "valid_bearing_edges": 2830,
+  "invalid_bearing_edges": 0,
+  "mean_bearing_error_rad": 0.05846816940778827,
+  "rms_bearing_error_rad": 0.0892142560111642,
+  "max_bearing_error_rad": 0.7566742100081149,
+  "mean_bearing_error_deg": 3.3499793429221816,
+  "rms_bearing_error_deg": 5.111600341839344,
+  "max_bearing_error_deg": 43.3542386998607
+}

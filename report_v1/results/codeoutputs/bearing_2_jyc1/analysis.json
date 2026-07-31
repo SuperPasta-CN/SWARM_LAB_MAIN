@@ -1,0 +1,56 @@
+{
+  "bearing_error_metric": "directed_edge_angular_error_3d",
+  "vehicles": {
+    "car1": {
+      "samples": 74,
+      "duration_s": 14.756285,
+      "path_length_m": 0.6596783533358137,
+      "speed_rmse_mps": 0.09825474538286824,
+      "velocity_rmse_mps": 0.14685391892985422,
+      "send_success_rate": 1.0
+    },
+    "car6": {
+      "samples": 74,
+      "duration_s": 14.756285,
+      "path_length_m": 1.6370118004522691,
+      "speed_rmse_mps": 0.06880787518915356,
+      "velocity_rmse_mps": 0.07593856294520963,
+      "send_success_rate": 1.0
+    }
+  },
+  "bearing_edges": {
+    "car1->car6": {
+      "samples": 74,
+      "valid_samples": 74,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.2723750377972973,
+      "rms_error_rad": 0.4854250919951938,
+      "max_error_rad": 1.256433378,
+      "mean_error_deg": 15.605940110501411,
+      "rms_error_deg": 27.812809041074328,
+      "max_error_deg": 71.98832979876522
+    },
+    "car6->car1": {
+      "samples": 74,
+      "valid_samples": 74,
+      "invalid_samples": 0,
+      "mean_error_rad": 0.2723750377972973,
+      "rms_error_rad": 0.4854250919951938,
+      "max_error_rad": 1.256433378,
+      "mean_error_deg": 15.605940110501411,
+      "rms_error_deg": 27.812809041074328,
+      "max_error_deg": 71.98832979876522
+    }
+  },
+  "bearing_global": {
+    "samples": 148,
+    "valid_samples": 148,
+    "invalid_samples": 0,
+    "mean_error_rad": 0.2723750377972973,
+    "rms_error_rad": 0.4854250919951938,
+    "max_error_rad": 1.256433378,
+    "mean_error_deg": 15.605940110501411,
+    "rms_error_deg": 27.812809041074328,
+    "max_error_deg": 71.98832979876522
+  }
+}

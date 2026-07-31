@@ -1,0 +1,517 @@
+% !TeX program = xelatex
+% 2026-07-28 麦轮小车 bearing 编队实车实验误差分析报告
+% 编译：xelatex report.tex（两遍）。图片位于 figs/，数值结果位于 results/。
+\documentclass[11pt,a4paper]{ctexart}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\hypersetup{colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black}
+\newcommand{\run}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{#1}}
+\newcommand{\degC}{^\circ}
+
+\title{\textbf{麦轮小车 bearing 编队实车实验误差分析报告}\\[2pt]
+\large ——2026-07-28 三次报告运行的误差来源与误差结构}
+\author{姜琰超}
+\date{2026-07-28}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+本文对 2026-07-28 麦轮小车 bearing 编队实车实验的三次报告运行
+（\run{bearing\_2\_jyc1}、\\ \run{bearing\_3\_jyc10}、\run{bearing\_4\_jyc1}，
+目录 \file{report\_0728/results/codeoutputs/}）做误差来源与误差结构分析，
+并以当日 WSL 侧全部 22 次原始运行作横向对照。
+
+核心结论：
+
+（1）三次运行全部收敛，\run{bearing\_2\_jyc1} 的全程平均误差
+$15.6\degC$ 是“初始布位偏差 $72\degC$ 叠加 仅 14.8\,s 时长”的平均虚影，
+其末 5\,s 稳态 $1.18\degC\pm0.25\degC$ 为三次最佳且恰等于死区理论值；
+
+（2）稳态残差分三种机制：两车为死区平衡、三车为持续爬行、四车为
+电机摩擦地板冻结；
+
+（3）动捕噪声贡献可忽略（$<0.01\degC$），稳态波动成分
+几乎全部来自电机死区补偿\\（\texttt{min\_effective=35}）引发的航向保持过饱和振荡；
+
+（4）逐边误差不对称是物理特性导致的，car1（及四车中的 car2）个体偏弱是主因；
+
+（5）\texttt{all\_bearing} 模式下编队平移/旋转/尺度不受控，三车运行结束时
+编队仍以 39\,mm/s 平移并在末 5\,s 再收缩 18.7\%。
+所有分析脚本、图与数值结果存于 \file{report\_0728/analysis/}。
+\end{abstract}
+
+\section{数据与方法}
+
+\subsection{数据来源}
+
+三次报告运行的运动学参数完全一致（各目录 \file{metadata.json} 实证）：
+$k_p=0.6$、\texttt{deadband}$=0.015$\,m/s、\texttt{wheel\_command\_min\_effective}$=35$、
+\texttt{max\_wheel\_speed\_mps}$=0.3$、\texttt{command\_speed\\\_limit}$=0.25$\,m/s、
+\texttt{agent\_mode=all\_bearing}（全员运动，无静止领航者；编队形状受控，
+整体平移/旋转/尺度自由），控制 50\,Hz、记录 5\,Hz。
+
+\begin{table}[H]
+\centering\small
+\caption{三次报告运行概况（\file{summary.json} 为全程统计，含瞬态）}
+\label{tab:runs}
+\begin{tabular}{lcccl}
+\toprule
+运行 & 时长/帧数 & 车辆 & 全程 mean/RMS/max & 目录 \\
+\midrule
+\run{bearing\_2\_jyc1} & 14.76\,s / 74 & car1, car6 & $15.61\degC/27.81\degC/71.99\degC$ & \multirow{3}{*}{\shortstack[l]{\file{report\_0728/results/}\\\file{codeoutputs/}}} \\
+\run{bearing\_3\_jyc10} & 18.01\,s / 90 & car1, car4, car6 & $3.39\degC/5.34\degC/23.32\degC$ & \\
+\run{bearing\_4\_jyc1} & 56.99\,s / 83 & car1 \textasciitilde \ car4 & $3.35\degC/5.11\degC/43.35\degC$ & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+对照组为 WSL \file{\textasciitilde/swarm\_lab\_jiang\_v1/runs/} 当日 22 次运行
+（15:35--17:11；15:38 前 \texttt{max\_wheel}$=0.5$ 且无死区补偿，其后改为 0.3
+并将 \texttt{min\_effective} 调至 25$\to$35），汇总见
+\file{analysis/results/wsl\_runs\\\_overview.json}。
+
+\subsection{计算口径}
+
+\begin{itemize}
+  \item 整体 bearing 误差：逐时刻对所有有向边角度误差取 RMS（与
+        \file{/tools/postprocess.py} 的
+        \texttt{\_overall\_formation\_error} 一致）。两车运行两条有向边误差恒等，
+        仅 1 个独立自由度。
+  \item 收敛时间 $t_{\mathrm{conv}}$：RMS 最后一次 $\ge 5\degC$ 之后的第一个采样时刻
+        （“破 $5\degC$ 且不再回头”）。
+  \item 稳态：末 5\,s 窗口（三次统一；四车另备末 10\,s，见
+        \file{results/goal1\_convergence.json}）。
+  \item \textbf{速度一律用位置中心差分重建}（同
+        \texttt{postprocess.\_position\_velocity}）：旧记录的
+        \texttt{measured\_vx/vy} 列含 10--50\,m/s 动捕尖峰，不可直接使用。
+  \item 轮指令统计：零 / 抬升（$|\cdot|=35$）/ 超越（$|\cdot|>35$）占比与符号翻转率。
+\end{itemize}
+
+\subsection{控制律与死区理论值}
+
+控制律 $u_i=k_p\sum_j P_{ij}(g_{ij}-g^*_{ij})$（\file{swarm/algorithms/bearing.py}），
+经 $v=v_{\max}\tanh(|u|/v_{\max})$ 饱和，且 $v<\texttt{deadband}$ 时清零。
+故单车指令为零的条件为
+\begin{equation}
+|u|<u_{\mathrm{thr}}=v_{\max}\,\mathrm{atanh}\!\left(\frac{\texttt{deadband}}{v_{\max}}\right)
+=0.25\,\mathrm{atanh}(0.06)=0.01502\ \mathrm{m/s}.
+\end{equation}
+单边情形 $|u|=k_p\sin\theta$，对应角度死区
+\begin{equation}
+\theta_{\mathrm{db}}=\arcsin(u_{\mathrm{thr}}/k_p)=1.434\degC .
+\end{equation}
+注意死区作用于\textbf{单车求和向量}而非逐边：多边形车时各边误差向量相互抵消，
+可使 $|u|$ 低于门限而逐边误差各自大于 $1.43\degC$。
+
+\section{目标一：收敛时间与稳态残差对比}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{fig1_convergence_compare.png}
+\caption{三次报告运行整体 bearing RMS 误差曲线。两车运行从最大的 $72\degC$ 初始误差
+单调衰减；三次（两车/三车/四车）分别于 5.46/3.04/3.44\,s 减低至 $5\degC$。}
+\label{fig:conv}
+\end{figure}
+
+\begin{table}[H]
+\centering\small
+\caption{收敛时间与稳态残差（\file{results/goal1\_convergence.json}）}
+\label{tab:conv}
+\begin{tabular}{lcccccc}
+\toprule
+运行 & 初始 RMS & $t_{\mathrm{conv}}$ & 末5s mean$\pm$std & 末5s RMS & 末值 & 全程mean \\
+\midrule
+\run{bearing\_2\_jyc1} & $72.0\degC$ & 5.46\,s & $1.18\degC\pm0.25$ & $1.21\degC$ & $1.43\degC$ & $15.61\degC$ \\
+\run{bearing\_3\_jyc10} & $18.9\degC$ & 3.04\,s & $2.67\degC\pm0.39$ & $2.70\degC$ & $2.15\degC$ & $3.83\degC$ \\
+\run{bearing\_4\_jyc1} & $27.2\degC$ & 3.44\,s & $3.55\degC\pm0.02$ & $3.55\degC$ & $3.59\degC$ & $4.01\degC$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+要点：（i）瞬态衰减时间常数拟合为 2.0/5.6/6.4\,s（见 \ref{sec:b2} 节）；
+（ii）四车稳态 std 仅 $0.02\degC$——误差\textbf{冻结}而非涨落平衡，
+是摩擦地板机制的直接特征（\ref{sec:floor} 节）；
+（iii）\file{summary.json} 的全程 mean 把初始瞬态平均在内，对短运行系统性偏大，
+与稳态没有可比性（两车运行最极端）。
+
+\section{目标二：稳态残差来源分解}
+
+\subsection{三种稳态机制}
+
+由记录的期望/实际 bearing 重建逐车指令范数
+$|u_i|=|k_p\sum_j P_{ij}e_{ij}|$（图~\ref{fig:u}），三种稳态截然不同：
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{fig2b_command_norm_deadband.png}
+\caption{稳态窗口内重建的逐车指令范数 $|u_i|$，红虚线为死区门限
+$u_{\mathrm{thr}}=0.015$\,m/s。左：两车 $|u|$ 围绕门限波动（死区平衡）；
+中：三车持续高于门限（爬行）；右：四车恒高于门限（地板静摩擦力冻结运动，
+指令存在但车不动）。}
+\label{fig:u}
+\end{figure}
+
+\begin{table}[H]
+\centering\small
+\caption{稳态残差与机制对照（\file{results/goal2\_residual.json}）}
+\label{tab:mech}
+\begin{tabular}{lcccc}
+\toprule
+运行 & 末5s RMS & 死区理论 & $|u|$ 低于门限时间占比 & 机制 \\
+\midrule
+\run{bearing\_2\_jyc1} & $1.21\degC$ & $1.434\degC$ & 80\% & 死区平衡 \\
+\run{bearing\_3\_jyc10} & $2.70\degC$ & $1.434\degC$ & 0--4\% & 持续爬行 \\
+\run{bearing\_4\_jyc1} & $3.55\degC$ & $1.434\degC$ & 0\% & 静摩擦力冻结 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\linewidth]{fig2a_residual_decomposition.png}
+\caption{稳态残差分解：实测 RMS（蓝）减位置抖动等效（橙）后的结构性残差（绿）
+与死区理论值（红虚线）对照。两车结构性残差与死区理论吻合；三车、四车的超出
+部分分别由爬行态与摩擦地板解释（橙色为含真实抖动的上限估计）。}
+\label{fig:decomp}
+\end{figure}
+
+\subsection{航向保持过饱和振荡：稳态波动的主因}
+\label{sec:limitcycle}
+
+稳态轮指令统计（末 5\,s）：两车运行 100\% 处于抬升值 $\pm35$、零指令占 0\%，
+符号翻转 3.3--3.8 次/s；三车 84--100\% 抬升；四车 75--100\% 抬升。
+两车平移指令已被死区清零（\texttt{target\_vx=target\_vy=0}），轮指令仍恒非零——
+成对反号的 $(35,-35,35,-35)\leftrightarrow(-35,35,-35,35)$ 是\textbf{航向保持}
+（\texttt{heading\_hold}, $k_\omega=2.0$）的旋转分量被 \texttt{min\_effective}
+抬升的结果，构成过饱和振荡。直接证据见 \file{trajectory.csv} 末段：
+两车 \texttt{tvx=tvy=0} 时 yaw 在 $\pm0.2$\,rad 内振荡。
+
+过饱和振荡幅值（末 5\,s，yaw$-$目标航向，\file{results/goal3\_edges\_cars.json}）：
+两车 car1/car6 std $8.9\degC/13.4\degC$（峰峰 $33.5\degC/43.9\degC$）；
+三车 car6 std $20.1\degC$（峰峰 $76.6\degC$）；
+四车 car3 std $13.4\degC$（峰峰 $37.7\degC$），而 car1/car2/car4 不振但带
+恒定航向偏差 $-6.0\degC/-17.9\degC/-5.3\degC$。
+
+过饱和振荡把位置抖到毫米级，再经边长折算为 bearing 波动
+$\sigma_\theta\approx\sqrt{\sigma_i^2+\sigma_j^2}/L$，
+与逐边实测 std 吻合（表~\ref{tab:jitter}）。\textbf{边越短放大越大}：
+三车运行边长仅 0.44--0.67\,m，是其波动大于两车的原因。
+
+\begin{table}[H]
+\centering\small
+\caption{逐边误差波动 vs 位置抖动等效角（末 5\,s）}
+\label{tab:jitter}
+\begin{tabular}{llccc}
+\toprule
+运行 & 边 & 实测 std & 抖动等效 & 边长 $L$ \\
+\midrule
+\run{bearing\_2\_jyc1} & car1--car6 & $0.25\degC$ & $0.18\degC$ & 1.215\,m \\
+\run{bearing\_3\_jyc10} & car1--car4 & $1.16\degC$ & $0.59\degC$ & 0.517\,m \\
+\run{bearing\_3\_jyc10} & car1--car6 & $1.32\degC$ & $0.91\degC$ & 0.436\,m \\
+\run{bearing\_3\_jyc10} & car4--car6 & $0.72\degC$ & $0.58\degC$ & 0.674\,m \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{摩擦地板：四车残差为何冻在 \texorpdfstring{$3.55\degC$}{3.55°}}
+\label{sec:floor}
+
+\run{bearing\_4\_jyc1} 末段逐样本数据：car1 目标速度 $(-0.02,-0.027)$\,m/s
+恒非零、轮指令恒定 $(35,35,-35,35)$，而位置 5\,s 内变化 $<0.1$\,mm
+（$\sigma_{\mathrm{pos}}=0.03$\,mm；car2/car4 为 0.38/0.07\,mm）。
+即\textbf{抬升后的 $\pm35$ 轮指令克服不了这三辆车的静摩擦}：
+控制指令持续存在但车不动，bearing 误差冻结在瞬态结束时的残余值
+（逐边 $0.72\degC$--$5.48\degC$）。唯一仍在动的是 car3
+（$\sigma_{\mathrm{pos}}=4.96$\,mm，航向过饱和振荡）。
+对四车而言，有效残差下限不是 $\texttt{deadband}/k_p$，
+而是“让最弱的车动起来的最小指令”所对应的角度。
+
+\subsection{动捕噪声：可忽略}
+
+四车 car1 静止段给出纯动捕噪声底 $\sigma_{\mathrm{pos}}\approx0.03$\,mm
+（位置在 0.1\,mm 内起伏且 \texttt{mocap\_time\_s} 持续递增，非数据冻结）。
+按 $\sqrt{2}\sigma/L$ 折算到最短的 0.44\,m 边仅 $\approx0.01\degC$，
+相对 $1\degC$--$5\degC$ 的残差可忽略。
+交接文档“超出死区部分含 mocap 噪声”的假设\textbf{不成立}：
+超出部分由过饱和振荡抖动与摩擦地板完全解释。
+
+\section{目标三：逐边误差不对称性与逐车差异}
+
+\subsection{逐边（末 5\,s，有符号均值）}
+
+\begin{table}[H]
+\centering\small
+\caption{逐边稳态误差（\file{results/goal3\_edges\_cars.json}，图~\ref{fig:edges}）}
+\label{tab:edges}
+\begin{tabular}{lc@{\hspace{2em}}lc}
+\toprule
+\multicolumn{2}{c}{\run{bearing\_3\_jyc10}} & \multicolumn{2}{c}{\run{bearing\_4\_jyc1}} \\
+\midrule
+car1--car4 & $-2.37\degC\pm1.16$ & car1--car2 & $+0.78\degC\pm0.01$ \\
+car1--car6 & $-2.55\degC\pm1.49$ & car1--car3 & $+2.16\degC\pm0.15$ \\
+car4--car6 & $+2.38\degC\pm0.72$ & car1--car4 & $\mathbf{-5.48\degC\pm0.00}$ \\
+ & & car2--car4 & $\mathbf{+5.21\degC\pm0.02}$ \\
+ & & car3--car4 & $+0.72\degC\pm0.31$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{fig3a_edge_asymmetry.png}
+\caption{逐边稳态误差（末 5\,s 均值，须线为 std）。}
+\label{fig:edges}
+\end{figure}
+
+四车的两条大误差边符号相反，是“顶点被夹错位置”的模式。期望形状经相似变换
+拟合到实际构型（图~\ref{fig:shape}）：\textbf{car1 偏 84.6\,mm、car2 偏
+83.5\,mm}（car3/car4 各约 32\,mm，拟合 RMS 63.7\,mm）——85\,mm 放在
+1.4--1.8\,m 边上正是 $3\degC$--$5\degC$，误差集中在 car1/car2 与 car4 的连线上，
+与“car1、car2 最弱、最先被摩擦冻住”一致。三车三条边误差均匀
+（$2.4\degC$--$2.6\degC$），形状拟合残差仅 10.1\,mm：三角形形状基本正确，
+残差主要来自爬行/抖动动态。两车构型恒可相似重合（无形状自由度）。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{fig3b_shape_fit.png}
+\caption{稳态构型（圆点）vs 期望形状最优相似拟合（灰叉），红色箭头为逐车残差位移。
+两车无形状自由度（拟合恒零）；三车残差约 10\,mm；四车 car1/car2 各偏约 85\,mm。}
+\label{fig:shape}
+\end{figure}
+
+\subsection{逐车速度跟踪与 car1 个体差异}
+
+速度由位置中心差分重建（图~\ref{fig:vel}）：
+
+\begin{table}[H]
+\centering\small
+\caption{逐车速度跟踪（\file{results/goal3\_edges\_cars.json}）}
+\label{tab:vel}
+\begin{tabular}{llccc}
+\toprule
+运行 & 车辆 & 全程RMSE (m/s) & 瞬态峰值 (m/s) & 响应比$^*$ \\
+\midrule
+\run{bearing\_2} & car1 & \textbf{0.147} & 0.34 & \textbf{0.42} \\
+ & car6 & 0.076 & 0.23 & 1.09 \\
+\midrule
+\run{bearing\_3} & car1 / car4 / car6 & 0.112 / 0.070 / 0.056 & 0.32 / 0.20 / 0.18 & 1.29 / 1.38 / 0.62 \\
+\midrule
+\run{bearing\_4} & car1 & \textbf{0.095} & 0.28 & 0.77 \\
+ & car2 / car3 / car4 & 0.052 / 0.048 / 0.044 & 0.23 / 0.20 / 0.22 & 0.34 / 1.30 / 1.22 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{fig3c_velocity_tracking.png}
+\caption{逐车速度跟踪误差 $\|v^*-v\|$（$v$ 为位置差分）。两车运行 car1（蓝）
+在 0--4\,s 持续约 0.25\,m/s；四车运行 car1 全程高于其余车约 2 倍。}
+\label{fig:vel}
+\end{figure}
+
+\textbf{car1 偏弱跨运行一致}：两车运行瞬态 0--4\,s 速度误差持续
+$\sim0.25$\,m/s，前 6\,s 位移 0.45\,m 仅为 car6（1.19\,m）的 38\%；
+四车运行全程 RMSE 0.095\,m/s $\approx$ 其余车 2 倍；与当日 15:38 卡死运行
+（实际/指令速度比 0.12，见 \file{swarm\_lab\_jiang\_v1/problems.txt}）方向一致。
+四车中 \textbf{car2 同样偏弱}（响应比 0.34，且带 $-17.9\degC$ 恒定航向偏差、
+std 仅 $1.3\degC$——航向保持完全拉不回），其形状残差 83.5\,mm 与 car1 相当。
+响应比 $>1$ 的车（car3/car4 等）是过饱和振荡抖动抬高 $|v_{\mathrm{actual}}|$ 所致，
+不能读作“快于指令”；强弱判据以瞬态位移与全程 RMSE 为准。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{fig3d_heading_hold.png}
+\caption{稳态窗口航向保持误差：可见 1--2.5\,Hz 锯齿过饱和振荡；
+四车 car2 恒偏约 $-18\degC$。}
+\label{fig:heading}
+\end{figure}
+
+\section{目标四：\run{bearing\_2\_jyc1} mean \texorpdfstring{$15.6\degC$}{15.6°} 专项}
+\label{sec:b2}
+
+\subsection{形态判定：既不是未收敛，也不是振荡/卡死}
+
+逐时刻 RMS 曲线（图~\ref{fig:b2morph}）从 $72.0\degC$ 基本单调衰减
+（73 步中仅 18 步小幅回升，幅度 $<1\degC$），5.46\,s 破 $5\degC$，
+末 3\,s 斜率 $+0.25\degC$/s 属死区附近正常反弹。无卡死：car1/car6 全程路径
+0.66/1.64\,m。末 5\,s 稳态 $1.18\degC\pm0.25$、末值 $1.43\degC$ 恰为死区理论值
+——已到达其自身稳态。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{fig4a_bearing2_morphology.png}
+\caption{\run{bearing\_2\_jyc1} 误差曲线形态：单调收敛，5.46\,s 破 $5\degC$，
+稳态压在死区理论值 $1.43\degC$ 上。}
+\label{fig:b2morph}
+\end{figure}
+
+\subsection{\texorpdfstring{$15.6\degC$}{15.6°} 的算术来源与横向验证}
+
+全程 mean $15.61\degC$ = 前 5\,s 均值 $43.6\degC$（瞬态）与 5\,s 后均值
+$1.33\degC$（稳态）的加权平均；14.8\,s 短时长令瞬态占权重 $1/3$，
+且初始误差 $72\degC$ 远大于其他运行（$18.9\degC/27.2\degC$）。
+初始几何：$t=0$ 时 car1$\to$car6 实际方位 $(-0.951,0.309)$ vs 期望 $(0,1)$，
+偏差正好 $72.0\degC$，间距 0.98\,m。
+
+图~\ref{fig:scatter} 给出当日全部 22 次运行的横向验证：初始 RMS 与全程 mean
+强相关，所有初始误差 $\le29\degC$ 且参数正常的运行全程 mean 均 $\le11\degC$；
+\run{bearing\_2\_jyc1} 恰好是“高初始误差 + 短时长”的组合，完全落在规律内，
+无需任何额外异常解释。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{fig4c_initial_vs_mean.png}
+\caption{当日 22 次运行：初始 RMS vs 全程 mean（圆点=收敛，叉=未收敛）。
+全程 mean 由初始条件与时长主导。}
+\label{fig:scatter}
+\end{figure}
+
+衰减时间常数对比（图~\ref{fig:tau}，RMS 超出稳态部分的指数拟合）：
+两车 $\tau=2.0$\,s $<$ 三车 5.6\,s $<$ 四车 6.4\,s——两车瞬态反而最快
+（单车仅一条边、大误差下 tanh 饱和全速纠偏）。若该运行持续 25--30\,s，
+全程 mean 将降至约 $5\degC$ 以下（明确标注为按末段稳态的外推）。
+唯一真实的不利因素是 car1 偏弱：纠偏几乎由 car6 单独完成
+（前 6\,s 位移比 $0.45:1.19$），否则收敛可再快约一倍（定性估计）。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{fig4b_tau_compare.png}
+\caption{三次运行瞬态衰减（超出稳态部分，对数轴）与时间常数。}
+\label{fig:tau}
+\end{figure}
+
+\section{目标五：\texttt{all\_bearing} 模式的编队自由度}
+
+逐帧对首帧做相似变换拟合，分解质心平移、整体旋转与尺度
+（\file{results/goal5\_drift.json}，图~\ref{fig:drift}）。
+
+\begin{table}[H]
+\centering\small
+\caption{编队自由度量化（总 = 相对首帧；末5s = 稳态窗口速率/变化量）}
+\label{tab:drift}
+\begin{tabular}{lcccccc}
+\toprule
+运行 & 质心位移(总) & 质心速率(末5s) & 旋转(总) & 旋转速率(末5s) & 尺度(末/初) & 尺度变化(末5s) \\
+\midrule
+\run{bearing\_2} & 0.662\,m & 7.7\,mm/s & $-73.4\degC$ & $+0.01\degC$/s & 1.234 & $+0.7\%$ \\
+\run{bearing\_3} & 0.697\,m & \textbf{38.8\,mm/s} & $-3.1\degC$ & $+0.58\degC$/s & \textbf{0.456} & $\mathbf{-18.7\%}$ \\
+\run{bearing\_4} & 0.580\,m & 1.1\,mm/s & $\mathbf{-14.2\degC}$ & $+0.05\degC$/s & 0.694 & $-0.05\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{fig5_formation_drift.png}
+\caption{编队自由度时间序列（行=运行；列=质心位移/旋转/尺度/形状残差）。
+四车旋转 $-14.2\degC$、尺度缩至 0.694 后被摩擦冻结；三车尺度持续收缩至
+0.456 且结束时仍在运动；两车旋转 $-73.4\degC$ 即纠偏过程本身。
+（两车形状残差恒为 $10^{-13}$ 量级，两点构型无形状自由度。）}
+\label{fig:drift}
+\end{figure}
+
+要点：
+\begin{itemize}
+  \item \textbf{四车}：整体旋转 $-14.2\degC$（与轨迹图可见的整体转动一致）、
+        尺度收缩 31\%，全部发生在收敛前瞬态；收敛后质心 1.1\,mm/s、
+        旋转 $0.05\degC$/s——编队被摩擦冻住，自由度漂移随之停止。
+  \item \textbf{两车}：为消除 $72\degC$ 初始误差整体旋转 $-73.4\degC$；
+        间距拉大 23\%（0.98$\to$1.22\,m）。理想双车指令严格反对称、保距，
+        $+23\%$ 尺度变化来自执行不对称（car1 响应比 0.42）与过饱和振荡耦合。
+  \item \textbf{三车}：收敛的是 bearing 误差而非编队——结束时质心仍以
+        38.8\,mm/s 平移、$0.58\degC$/s 旋转，尺度末 5\,s 再缩 18.7\%
+        （相对首帧已缩至 0.456）。其“稳态残差 $2.7\degC$”应理解为动态
+        爬行中的误差水平，不宜与另外两次的静态冻结值直接比较。
+  \item 结论：\texttt{all\_bearing} 下“位置保持”类指标无收敛保证，
+        且受执行不对称与摩擦地板调制；报告此类指标必须同时给出上表量化，
+        否则三车与四车的差异会被误读为控制性能差异。
+\end{itemize}
+
+\section{误差结构总表}
+
+\begin{table}[H]
+\centering\small
+\caption{误差来源 $\to$ 机制 $\to$ 量级 $\to$ 证据}
+\label{tab:budget}
+\begin{tabular}{clp{4.6cm}p{3.4cm}l}
+\toprule
+\# & 来源 & 机制 & 量级（实测） & 证据 \\
+\midrule
+1 & 初始布位 & 摆放方位与期望不符 & 初始 RMS $18.9\degC$--$72.0\degC$ & 图~\ref{fig:scatter} \\
+2 & 控制律死区 & $|u|<0.01502$ 清零，$\theta_{\mathrm{db}}=1.434\degC$ & 两车稳态 $1.18\degC\pm0.25$ & 图~\ref{fig:u} \\
+3 & 摩擦地板 & $\pm35$ 抬升推不动车，误差冻结 & 四车 $3.55\degC$（std $0.02\degC$） & \ref{sec:floor} 节 \\
+4 & 航向过饱和振荡 & 抬升旋转分量，yaw $\pm10\degC$--$20\degC$ & 逐边波动 $0.2\degC$--$1.5\degC$ & 图~\ref{fig:heading} \\
+5 & 逐车差异 & car1/car2 偏弱 & 形状错位约 85\,mm，大误差边 $\approx5.3\degC$ & 图~\ref{fig:shape},\ref{fig:vel} \\
+6 & 自由度 & 平移/旋转/尺度不受控 & 旋转 $-73/-3/-14\degC$，尺度 $+23/-54/-31\%$ & 表~\ref{tab:drift} \\
+7 & 动捕噪声 & 静止目标抖动 & $<0.01\degC$，可忽略 & \ref{sec:floor} 节 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+稳态残差预算（末 5\,s RMS）：两车 = 死区 $1.43\degC$ 带内波动（$1.21\degC$）；
+三车 $\approx$ 爬行平衡均值 $2.4\degC$--$2.6\degC$ $+$ 过饱和振荡波动
+$0.6\degC$--$1.3\degC$；四车 = 摩擦地板冻结值 $3.55\degC$
+（逐边 $0.72\degC$--$5.48\degC$，由瞬态结束时刻的形状错位决定）。
+
+\section{不确定项}
+
+\begin{enumerate}
+  \item \textbf{三车持续收缩的机制}：观测成立（末 5\,s 尺度 $-18.7\%$），
+        但“多边求和指令的径向分量 / 逐车执行不对称 / 过饱和振荡耦合”三者
+        贡献比例未能从现有数据分离。
+  \item \textbf{四车收敛后残差缓升}（约 $2.5\degC\to3.55\degC$）的驱动力
+        未单独定位；量级小且与摩擦冻结共存。
+  \item \textbf{car1/car2 偏弱的物理原因}（电量/电机/摩擦）数据无法区分；
+        建议后续实验记录电池电压并做空载轮速标定。
+  \item 响应比 $>1$ 受过饱和振荡抖动污染，不作快慢判据。
+  \item 两车运行未抽视频帧核对：曲线形态单调清晰、无歧义。
+  \item 22 次 WSL 运行仅取粗指标横向对照，未逐次做稳态分解。
+\end{enumerate}
+
+\section{对后续实验的建议}
+
+\begin{enumerate}
+  \item “稳态残差”一律用末 $N$ 秒窗口，禁用全程 mean（对短运行系统性偏大）。
+  \item 初始布位尽量贴近期望相对方位（本次最大 $72\degC$），或在记录中
+        标注初始 RMS 以便解释。
+  \item 若需压低四车残差：提高 \texttt{min\_effective}（对 car1/car2/car4
+        实测 35 不足）或单独标定弱车；注意这会同时加大过饱和振荡抖动，需权衡。
+  \item 航向过饱和振荡可通过减小 $k_\omega$ 或对航向通道设独立死区缓解
+        （改动需重测，本文不展开）。
+\end{enumerate}
+
+\appendix
+\section{分析产物与复跑}
+
+产物根目录 \file{report\_0728/analysis/}（全部为本次分析新建，未改动任何
+现有文件）：
+
+\begin{itemize}
+  \item 脚本：\file{common.py}（数据加载与统一口径）、
+        \file{goal1\_convergence.py}、\file{goal2\_residual.py}、
+        \file{goal3\_edges\_cars.py}、\file{goal4\_bearing2.py}、
+        \file{goal4b\_wsl\_overview.py}、\file{goal5\_drift.py}。
+        复跑：\texttt{cd report\_0728/analysis \&\& python <脚本>}。
+  \item 图：\file{figs/fig1}（收敛对比）、\file{fig2a/2b}（残差分解、
+        指令范数）、\file{fig3a--3d}（逐边/形状/速度/航向）、
+        \file{fig4a--4c}（两车形态、时间常数、22 次散点）、
+        \file{fig5}（编队自由度）。
+  \item 数值结果：\file{results/goal1\_convergence.json}、
+        \file{goal2\_residual.json}、\file{goal3\_edges\_cars.json}、
+        \file{goal4\_bearing2.json}、\file{goal5\_drift.json}、
+        \file{wsl\_runs\_overview.json}。
+  \item 本文 Markdown 版：\file{report\_0728/analysis/report.md}。
+\end{itemize}
+
+\end{document}

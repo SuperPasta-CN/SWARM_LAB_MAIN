@@ -41,11 +41,11 @@ def _wheels(values):
 def _minimal_config(execution: ExecutionConfig) -> ExperimentConfig:
     return ExperimentConfig(
         name="unit",
-        algorithm="bearing",
-        vehicles=(VehicleConfig("car1", "captain", "ground_vehicle", "10.1.1.81"),),
+        algorithm="task_driven",
+        vehicles=(VehicleConfig("car1", "ground_vehicle", "10.1.1.81"),),
         topology=TopologyConfig(
             adjacency_matrix=((0,),),
-            bearing_matrix=(((0.0, 0.0, 0.0),),),
+            formation={"car1": (0.0, 0.0)},
         ),
         execution=execution,
     )

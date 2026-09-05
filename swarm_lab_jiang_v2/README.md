@@ -161,7 +161,8 @@ python -m unittest discover -s tests -v
 | `bearing_control.integral_limit` | 0.5 | 积分向量模长限幅（抗饱和） |
 | `bearing_control.deadband_mps` | 0.015 | 死区。残差角 ≈ deadband/kp 弧度量级 |
 | `runtime.command_speed_limit_mps` | 0.25 | 平滑饱和上限，也是 captain/first_mate 合成限速 |
-| `execution.mode` | "omni" | omni 麦轮开环（默认）/ omni_pid 麦轮+速度 PI / diff 差速 |
+| `execution.mode` | "omni_pid" | omni_pid 麦轮+速度 PI 闭环（默认，8/3 诊断后切换）/ omni 麦轮开环 / diff 差速 |
+| `execution.heading_target_rad` | None | 航向目标（世界系 rad）：None=解锁时捕获当前朝向；设为机动方向（如 +x 即 0.0）后各车解锁自转对准，摆放朝向随意（麦轮斜行效率远低于直行，8/14 斜行段达成率 47–73%） |
 | `VehicleConfig.execution_override` | None | **按车覆盖** max_wheel_speed_mps / wheel_command_min_effective / wheel_flip（弱车单独标定，v1 car1/car2 教训） |
 | `preflight.captain_edge_warn_deg` | 45 | captain 相关边初始误差软警告阈值 |
 | `preflight.min_separation_m` | 0.20 | 最小车距硬校验 |

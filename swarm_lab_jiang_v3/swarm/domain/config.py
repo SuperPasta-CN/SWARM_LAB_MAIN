@@ -1,4 +1,15 @@
-"""Typed configuration grouped by algorithm, experiment, and runtime concerns."""
+"""Typed configuration grouped by algorithm, experiment, and runtime concerns (v3).
+
+v3 replaces the bearing-only projection law and the captain/first_mate/crew
+role system with the matrix-weighted Laplacian constraint law plus a
+task-driven term:
+
+    u_i = -k * sum_j A_ij (p_i - p_j + b_ij) + Z_i w
+
+The desired formation is given as per-vehicle coordinates ``p_i*`` (the
+``b_ij`` blocks are derived from them), task modes ``Z`` by name, and the
+mode velocities ``w`` support a piecewise-constant schedule.
+"""
 
 from __future__ import annotations
 
@@ -6,9 +17,7 @@ from dataclasses import dataclass, field
 from math import sqrt
 from typing import Mapping, Optional, Sequence, Tuple
 
-from swarm.domain.models import Vector3
-
-VEHICLE_ROLES = ("captain", "first_mate", "crew")
+from swarm.domain.models import Vector2, Vector3
 
 
 @dataclass(frozen=True)
@@ -21,42 +30,17 @@ class PIDConfig:
 
 
 @dataclass(frozen=True)
-class BearingControlConfig:
-    """Parameters of the projected bearing-only formation law.
+class TaskDrivenConfig:
+    """Parameters of the matrix-weighted Laplacian constraint law.
 
-    The pure proportional law (``ki = kd = 0``) tracks a moving leader only
-    with a constant steady-state error; the optional integral term removes
-    it (``ki > 0``) and the derivative term adds damping (``kd > 0``).  The
-    integral state is one vector per vehicle, ``xi += raw * dt`` with
-    ``raw = sum P(g - g*)``, clamped to ``integral_limit`` in norm.
+    ``k`` is the formation gain (constraint term ``-k * sum_j A_ij e_ij``
+    with the relative-position error ``e_ij = p_i - p_j + b_ij`` in meters).
+    ``deadband_mps`` zeroes the *shaped* constraint term below it (the task
+    term is never deadbanded).
     """
 
-    kp: float = 0.6
-    ki: float = 0.0
-    kd: float = 0.0
-    integral_limit: float = 0.5
+    k: float = 0.8
     deadband_mps: float = 0.015
-    bearing_3d: bool = False
-
-
-@dataclass(frozen=True)
-class FirstMateParams:
-    """Blending parameters for one first-mate vehicle.
-
-    The first mate combines its fixed velocity ``v_fm`` with the bearing
-    control term ``u``; the blended result is speed-limited afterwards:
-
-    - ``"weighted"`` (default): ``v = alpha * v_fm + (1 - alpha) * u``
-    - ``"additive"``:           ``v = v_fm + u``
-
-    ``velocity=None`` resolves to the captain velocity (Zhao & Zelazo,
-    bearing-based formation maneuvering, Proposition 1: with all leaders
-    sharing v_c the formation translates without changing scale).
-    """
-
-    velocity: Optional[Vector3] = None
-    blend_weight: float = 0.5
-    blend_mode: str = "weighted"  # "weighted" | "additive"
 
 
 @dataclass(frozen=True)
@@ -79,21 +63,6 @@ class ObstacleAvoidanceConfig:
     repulsive_gain: float = 0.0005
     min_distance_epsilon_m: float = 0.01
     avoid_other_vehicles: bool = True
-
-
-@dataclass(frozen=True)
-class ConstantVelocityConfig:
-    """Fixed world-frame velocity step for chassis tracking tests.
-
-    Used by ``algorithm="constant_velocity"``: every vehicle is commanded
-    (vx_mps, vy_mps) for ``duration_s`` seconds.  Kept as the controlled
-    step input for chassis calibration; there is deliberately no catalog
-    config for it in v2.
-    """
-
-    vx_mps: float = 0.0
-    vy_mps: float = 0.0
-    duration_s: float = 5.0
 
 
 @dataclass(frozen=True)
@@ -143,8 +112,7 @@ class ExecutionConfig:
 
 @dataclass(frozen=True)
 class VehicleExecutionOverride:
-    """Per-vehicle execution-side calibration (pays off the v1 debt of
-    treating every chassis alike although e.g. car1/car2 ran weaker).
+    """Per-vehicle execution-side calibration (weak cars get their own).
 
     Any field left ``None`` inherits the experiment-wide ExecutionConfig.
     """
@@ -156,8 +124,9 @@ class VehicleExecutionOverride:
 
 @dataclass(frozen=True)
 class VehicleConfig:
+    """One vehicle.  v3 has no roles: every agent runs the same law."""
+
     vehicle_id: str
-    role: str  # "captain" | "first_mate" | "crew" — the only role source of truth
     platform: str
     address: str
     execution_override: Optional[VehicleExecutionOverride] = None
@@ -165,8 +134,17 @@ class VehicleConfig:
 
 @dataclass(frozen=True)
 class TopologyConfig:
+    """Adjacency + desired formation coordinates + optional scalar weights.
+
+    ``formation`` maps each vehicle_id to its desired world-frame position
+    ``p_i*`` (meters); the controller derives ``b_ij = p_j* - p_i*``.
+    ``edge_weight_matrix`` holds scalar weights ``a_ij`` (default 1.0 on
+    adjacent pairs); matrix weights are an extension point of the spec.
+    """
+
     adjacency_matrix: Sequence[Sequence[int]]
-    bearing_matrix: Sequence[Sequence[Sequence[float]]]
+    formation: Mapping[str, Vector2]
+    edge_weight_matrix: Optional[Sequence[Sequence[float]]] = None
 
 
 @dataclass(frozen=True)
@@ -187,16 +165,14 @@ class TelemetryConfig:
 class PreflightConfig:
     """Hard checks that must pass before wheels are allowed to spin.
 
-    ``captain_edge_warn_deg`` is a *soft* warning threshold: edges incident
-    to the captain whose initial bearing error exceeds it are printed as
-    warnings but never block takeoff (v2 has no pinned leader baseline, so
-    the v1 anchor hard check no longer applies).
+    ``formation_warn_m`` is a *soft* warning threshold on the initial
+    formation RMS error (meters): reported, never blocks takeoff.
     """
 
-    captain_edge_warn_deg: float = 45.0
     min_separation_m: float = 0.20
     mocap_timeout_s: float = 10.0
     require_confirmation: bool = True
+    formation_warn_m: float = 0.15
 
 
 @dataclass(frozen=True)
@@ -218,12 +194,22 @@ class RuntimeConfig:
     udp_timeout_s: float = 0.2
     command_speed_limit_mps: float = 0.25
     stop_on_converge: bool = False
-    converge_eps_rad: float = 0.05
+    # Convergence in meters (mean relative-position edge error).
+    converge_eps_m: float = 0.03
     converge_hold_s: float = 3.0
     telemetry: TelemetryConfig = field(default_factory=TelemetryConfig)
 
 
-def _speed(vector: Vector3) -> float:
+@dataclass(frozen=True)
+class ConstantVelocityConfig:
+    """Fixed world-frame velocity step for chassis tracking tests."""
+
+    vx_mps: float = 0.0
+    vy_mps: float = 0.0
+    duration_s: float = 5.0
+
+
+def _speed(vector) -> float:
     return sqrt(sum(component * component for component in vector))
 
 
@@ -233,14 +219,15 @@ class ExperimentConfig:
     algorithm: str
     vehicles: Tuple[VehicleConfig, ...]
     topology: TopologyConfig
-    captain_velocity: Vector3 = (0.0, 0.0, 0.0)
-    # Piecewise-constant captain speed schedule [(t_seconds, velocity), ...],
-    # empty = constant captain_velocity for the whole run.
-    captain_velocity_schedule: Sequence[Tuple[float, Vector3]] = ()
-    # Keys must be vehicles with role="first_mate"; missing entries get the
-    # default FirstMateParams (v_fm = captain velocity, alpha = 0.5, weighted).
-    first_mate_params: Mapping[str, FirstMateParams] = field(default_factory=dict)
-    bearing_control: BearingControlConfig = field(default_factory=BearingControlConfig)
+    # Task-driven term: w (per-mode desired velocity, meters/second per
+    # translation mode) with an optional piecewise-constant schedule
+    # [(t_seconds, w), ...]; empty schedule = constant task_velocity.
+    task_velocity: Tuple[float, ...] = (0.0, 0.0)
+    task_velocity_schedule: Sequence[Tuple[float, Tuple[float, ...]]] = ()
+    # Task modes of the Z basis: names from NAMED_TASK_MODES
+    # ("translate_x", "translate_y") or explicit 2n vectors.
+    task_modes: Tuple = ("translate_x", "translate_y")
+    control: TaskDrivenConfig = field(default_factory=TaskDrivenConfig)
     execution: ExecutionConfig = field(default_factory=ExecutionConfig)
     runtime: RuntimeConfig = field(default_factory=RuntimeConfig)
     preflight: PreflightConfig = field(default_factory=PreflightConfig)
@@ -252,88 +239,69 @@ class ExperimentConfig:
     def vehicle_ids(self) -> Tuple[str, ...]:
         return tuple(vehicle.vehicle_id for vehicle in self.vehicles)
 
-    def _validate_roles(self) -> None:
-        roles = [vehicle.role for vehicle in self.vehicles]
-        for vehicle in self.vehicles:
-            if vehicle.role not in VEHICLE_ROLES:
+    def _validate_topology(self) -> None:
+        from swarm.algorithms.task_driven import NAMED_TASK_MODES
+
+        n = len(self.vehicle_ids)
+        adjacency = self.topology.adjacency_matrix
+        if len(adjacency) != n or any(len(row) != n for row in adjacency):
+            raise ValueError("adjacency_matrix must be square and match vehicle count")
+        formation = self.topology.formation
+        missing = [vid for vid in self.vehicle_ids if vid not in formation]
+        if missing:
+            raise ValueError("formation is missing coordinates for: %s" % missing)
+        weights = self.topology.edge_weight_matrix
+        if weights is not None:
+            if len(weights) != n or any(len(row) != n for row in weights):
+                raise ValueError("edge_weight_matrix must be square and match vehicle count")
+            for row in weights:
+                for value in row:
+                    if value < 0.0:
+                        raise ValueError("edge weights must be non-negative")
+        # The task modes are meaningful only when null(L_A) is exactly the
+        # global translations, which requires a connected graph.
+        seen = {0}
+        frontier = [0]
+        while frontier:
+            node = frontier.pop()
+            for other in range(n):
+                if other not in seen and (adjacency[node][other] or adjacency[other][node]):
+                    seen.add(other)
+                    frontier.append(other)
+        if len(seen) != n:
+            raise ValueError("adjacency graph must be connected")
+        for mode in self.task_modes:
+            if isinstance(mode, str) and mode not in NAMED_TASK_MODES:
                 raise ValueError(
-                    "vehicle %s role must be one of %s"
-                    % (vehicle.vehicle_id, VEHICLE_ROLES)
-                )
-        if roles.count("captain") != 1:
-            raise ValueError("exactly one vehicle must have role 'captain'")
-        first_mates = {
-            vehicle.vehicle_id for vehicle in self.vehicles if vehicle.role == "first_mate"
-        }
-        for key in self.first_mate_params:
-            if key not in first_mates:
-                raise ValueError(
-                    "first_mate_params key %r is not a first_mate vehicle" % key
-                )
-        limit = self.runtime.command_speed_limit_mps
-        for key, params in self.first_mate_params.items():
-            if not 0.0 <= params.blend_weight <= 1.0:
-                raise ValueError(
-                    "first_mate_params[%s].blend_weight must be in [0, 1]" % key
-                )
-            if params.blend_mode not in ("weighted", "additive"):
-                raise ValueError(
-                    "first_mate_params[%s].blend_mode must be 'weighted' or 'additive'"
-                    % key
-                )
-            if params.velocity is not None and _speed(params.velocity) > limit:
-                raise ValueError(
-                    "first_mate_params[%s].velocity must not exceed "
-                    "command_speed_limit_mps" % key
+                    "unknown task mode %r; available: %s" % (mode, NAMED_TASK_MODES)
                 )
 
-    def _validate_captain_velocity(self) -> None:
+    def _validate_task_velocity(self) -> None:
         limit = self.runtime.command_speed_limit_mps
-        if _speed(self.captain_velocity) > limit:
+        q = len(self.task_modes)
+        if len(self.task_velocity) != q:
             raise ValueError(
-                "captain_velocity must not exceed command_speed_limit_mps"
+                "task_velocity dimension %d must match the task-mode count %d"
+                % (len(self.task_velocity), q)
             )
+        if _speed(self.task_velocity) > limit:
+            raise ValueError("task_velocity must not exceed command_speed_limit_mps")
         previous_t = 0.0
-        for t, velocity in self.captain_velocity_schedule:
+        for t, velocity in self.task_velocity_schedule:
             if t < 0.0:
-                raise ValueError("captain_velocity_schedule times must be >= 0")
+                raise ValueError("task_velocity_schedule times must be >= 0")
             if t < previous_t:
-                raise ValueError(
-                    "captain_velocity_schedule times must be non-decreasing"
-                )
+                raise ValueError("task_velocity_schedule times must be non-decreasing")
             previous_t = t
+            if len(velocity) != q:
+                raise ValueError(
+                    "task_velocity_schedule velocities must have %d entries" % q
+                )
             if _speed(velocity) > limit:
                 raise ValueError(
-                    "captain_velocity_schedule speeds must not exceed "
+                    "task_velocity_schedule speeds must not exceed "
                     "command_speed_limit_mps"
                 )
-
-    def _validate_bearing_matrix_consistency(self) -> None:
-        """Opposite edges of the topology must carry opposite bearings."""
-
-        adjacency = self.topology.adjacency_matrix
-        bearings = self.topology.bearing_matrix
-        cos_tolerance = 0.9998476952  # cos(1 deg): normalized directions only
-        n = len(self.vehicle_ids)
-        for i in range(n):
-            for j in range(i + 1, n):
-                if not adjacency[i][j] and not adjacency[j][i]:
-                    continue
-                forward = tuple(float(c) for c in bearings[i][j])
-                backward = tuple(float(c) for c in bearings[j][i])
-                forward_norm = _speed(forward)
-                backward_norm = _speed(backward)
-                if forward_norm < 1e-9 or backward_norm < 1e-9:
-                    continue
-                # bearing[j][i] should be approximately -bearing[i][j]
-                dot = sum(
-                    forward[k] * backward[k] for k in range(3)
-                ) / (forward_norm * backward_norm)
-                if dot > -cos_tolerance:
-                    raise ValueError(
-                        "bearing_matrix edges (%d,%d) and (%d,%d) must be "
-                        "approximately opposite" % (i, j, j, i)
-                    )
 
     def validate(self) -> None:
         """Reject inconsistent configuration before external resources start."""
@@ -345,9 +313,8 @@ class ExperimentConfig:
             raise ValueError("vehicles must not be empty")
         if len(set(vehicle_ids)) != len(vehicle_ids):
             raise ValueError("vehicle IDs must be unique")
-        n = len(vehicle_ids)
-        if len(self.topology.adjacency_matrix) != n or len(self.topology.bearing_matrix) != n:
-            raise ValueError("topology dimensions must match vehicle count")
+        self._validate_topology()
+        self._validate_task_velocity()
         if self.runtime.control_hz <= 0.0:
             raise ValueError("control_hz must be positive")
         if self.runtime.max_plausible_speed_mps <= 0.0:
@@ -356,18 +323,11 @@ class ExperimentConfig:
             raise ValueError("velocity_diff_baseline_s must be positive")
         if self.runtime.command_speed_limit_mps <= 0.0:
             raise ValueError("command_speed_limit_mps must be positive")
-        control = self.bearing_control
-        if control.kp <= 0.0:
-            raise ValueError("bearing kp must be positive")
-        if control.ki < 0.0 or control.kd < 0.0:
-            raise ValueError("bearing ki/kd must be non-negative")
-        if control.integral_limit <= 0.0:
-            raise ValueError("bearing integral_limit must be positive")
+        control = self.control
+        if control.k <= 0.0:
+            raise ValueError("formation gain k must be positive")
         if control.deadband_mps < 0.0:
-            raise ValueError("bearing deadband_mps must be non-negative")
-        self._validate_roles()
-        self._validate_captain_velocity()
-        self._validate_bearing_matrix_consistency()
+            raise ValueError("deadband_mps must be non-negative")
         execution = self.execution
         if execution.mode not in ("omni", "omni_pid", "diff"):
             raise ValueError("execution.mode must be 'omni', 'omni_pid' or 'diff'")
@@ -416,17 +376,17 @@ class ExperimentConfig:
                     raise ValueError("execution_override.wheel_flip must contain four signs")
                 if any(sign not in (-1.0, 1.0, -1, 1) for sign in override.wheel_flip):
                     raise ValueError("execution_override.wheel_flip entries must be +1 or -1")
-        if self.runtime.converge_eps_rad <= 0.0:
-            raise ValueError("converge_eps_rad must be positive")
+        if self.runtime.converge_eps_m <= 0.0:
+            raise ValueError("converge_eps_m must be positive")
         if self.runtime.converge_hold_s <= 0.0:
             raise ValueError("converge_hold_s must be positive")
         preflight = self.preflight
-        if preflight.captain_edge_warn_deg <= 0.0:
-            raise ValueError("captain_edge_warn_deg must be positive")
         if preflight.min_separation_m < 0.0:
             raise ValueError("min_separation_m must be non-negative")
         if preflight.mocap_timeout_s <= 0.0:
             raise ValueError("mocap_timeout_s must be positive")
+        if preflight.formation_warn_m <= 0.0:
+            raise ValueError("formation_warn_m must be positive")
         avoidance = self.obstacle_avoidance
         if avoidance.vehicle_radius_m < 0.0:
             raise ValueError("vehicle_radius_m must be non-negative")

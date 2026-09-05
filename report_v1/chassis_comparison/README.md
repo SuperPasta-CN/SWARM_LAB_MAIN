@@ -55,3 +55,4 @@
   如需评估 VRPN 原生 twist，设 `runtime.require_twist=True` 并先在实机上
   验证 twist 坐标系。
 - 本目录只读原始记录，不改写任何运行数据。
+- 本实验的 workshop 论文版总结见 `report_v1/chassis_paper/`（paper.md / paper.tex，图与数值脚本在其 scripts/ 下）。

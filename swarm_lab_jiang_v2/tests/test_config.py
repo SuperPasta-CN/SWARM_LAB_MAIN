@@ -93,7 +93,7 @@ class DefaultConfigTests(unittest.TestCase):
         self.assertEqual(mate.blend_weight, 0.5)
         self.assertEqual(mate.blend_mode, "weighted")
         execution = ExecutionConfig()
-        self.assertEqual(execution.mode, "omni")
+        self.assertEqual(execution.mode, "omni_pid")
         self.assertTrue(execution.heading_hold)
         self.assertEqual(execution.mecanum_l_m, 0.10)
         self.assertEqual(execution.max_wheel_speed_mps, 0.5)

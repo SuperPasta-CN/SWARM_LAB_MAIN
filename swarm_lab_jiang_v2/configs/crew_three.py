@@ -26,6 +26,7 @@ ROS2 mocap topics (vrpn_client_ros default):
 """
 
 from swarm.domain.config import (
+    BearingControlConfig,
     ExperimentConfig,
     ExecutionConfig,
     ObstacleAvoidanceConfig,
@@ -66,14 +67,20 @@ CONFIG = ExperimentConfig(
             ),
         ),
     ),
-    # 定速平移机动；改 (0.0, 0.0, 0.0) 即退化为静态编队。变速用
-    # captain_velocity_schedule=[(t秒, (vx, vy, vz)), ...]（分段常值）。
+    # 巡航速度（同时也是 first_mate v_fm 的默认引用，装配期一次性解析——
+    # 用 schedule 变速时必须与 schedule 末值保持一致）。
     captain_velocity=(0.10, 0.0, 0.0),
+    # 先转向后行驶：t∈[0,3) 全员静止（航向自对准 + 静帧纠偏），t=3 s 起巡航。
+    captain_velocity_schedule=[(0.0, (0.0, 0.0, 0.0)), (3.0, (0.10, 0.0, 0.0))],
     # first_mate 默认参数：v_fm=captain 速度（共享 v_c → 纯平移、尺度不变）、
     # α=0.5、weighted；需要 additive 或自定义时在 first_mate_params 里覆盖。
     obstacle_avoidance=ObstacleAvoidanceConfig(enabled=True),
     static_obstacles=(),
-    # bearing 项默认纯 P（ki=0）。leader 速度非零时纯 P 有恒定跟踪误差，
-    # 开 PI：BearingControlConfig(ki=0.2, integral_limit=0.5)。
-    execution=ExecutionConfig(wheel_command_min_effective=25.0),
+    # bearing 项开 PI：ki 消除机动纯 P 稳态误差（8/14 crew_two 实证稳态 ~1°）。
+    bearing_control=BearingControlConfig(ki=0.2, integral_limit=0.5),
+    execution=ExecutionConfig(
+        wheel_command_min_effective=35.0,
+        # 航向对准机动方向 +x：摆放朝向随意，解锁后各车自转对准再巡航。
+        heading_target_rad=0.0,
+    ),
 )

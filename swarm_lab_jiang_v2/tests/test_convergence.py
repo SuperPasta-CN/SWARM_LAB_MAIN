@@ -32,11 +32,21 @@ STATIC_DURATION_S = 30.0
 MANEUVER_DURATION_S = 60.0
 RMS_TARGET_RAD = 5.0 * pi / 180.0
 
-STATIC_CONFIG = replace(CONFIG, captain_velocity=(0.0, 0.0, 0.0))
-MANEUVER_P_CONFIG = replace(CONFIG, captain_velocity=(0.05, 0.0, 0.0))
+# Fixtures pin every field they depend on (catalog crew_four carries a
+# rotate-first schedule and ki>0 since 08-14): nothing is inherited by accident.
+STATIC_CONFIG = replace(
+    CONFIG, captain_velocity=(0.0, 0.0, 0.0), captain_velocity_schedule=()
+)
+MANEUVER_P_CONFIG = replace(
+    CONFIG,
+    captain_velocity=(0.05, 0.0, 0.0),
+    captain_velocity_schedule=(),
+    bearing_control=BearingControlConfig(kp=0.6, ki=0.0),
+)
 MANEUVER_PI_CONFIG = replace(
     CONFIG,
     captain_velocity=(0.05, 0.0, 0.0),
+    captain_velocity_schedule=(),
     bearing_control=BearingControlConfig(kp=0.6, ki=0.3),
 )
 

@@ -49,6 +49,8 @@ dist/
 runs/
 logs/
 *.log
+# but archived experiment records are deliberate content, not runtime output
+!report_v3/runs/
 
 # Local editor and OS files
 .idea/

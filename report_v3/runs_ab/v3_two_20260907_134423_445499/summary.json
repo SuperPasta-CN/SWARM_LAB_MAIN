@@ -1,0 +1,11 @@
+{
+  "recorded_frames": 120,
+  "recorded_rows": 240,
+  "edge_error_metric": "directed_edge_relative_position_error_m",
+  "recorded_edges": 240,
+  "valid_edges": 240,
+  "invalid_edges": 0,
+  "mean_edge_error_m": 0.27989178822030464,
+  "rms_edge_error_m": 0.4682808075438697,
+  "max_edge_error_m": 1.0430346038004445
+}

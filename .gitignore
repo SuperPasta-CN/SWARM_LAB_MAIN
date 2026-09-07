@@ -1,10 +1,11 @@
-# This repository publishes six subdirectories:
+# This repository publishes seven subdirectories:
 #   stimulus/            (web-based bearing-formation simulator)
 #   swarm_lab_jiang_v1/  (ROS2 real-vehicle formation control project)
 #   report_v1/           (experiment analysis reports and comparison tools)
 #   swarm_lab_jiang_v2/  (role-based formation maneuvering: captain/first_mate/crew)
 #   report_v2/           (maneuvering experiment reports, empty for now)
 #   swarm_lab_jiang_v3/  (matrix-weighted Laplacian + task-driven formation control)
+#   report_v3/           (task-driven formation experiment data, analysis and report)
 # Everything else at the repo root stays local and untracked.
 /*
 !.gitignore
@@ -15,10 +16,14 @@
 !swarm_lab_jiang_v2/
 !report_v2/
 !swarm_lab_jiang_v3/
+!report_v3/
 
 # Large raw mocap captures stay local (big binaries, not source code)
 report_v1/results/videos/
 report_v2/results/videos/
+report_v3/v3_two1/
+report_v3/v3_three1/
+report_v3/v3_four1/
 
 # Python bytecode and caches
 __pycache__/

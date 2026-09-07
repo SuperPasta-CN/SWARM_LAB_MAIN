@@ -1,0 +1,163 @@
+{
+  "schema_version": 5,
+  "created_at": "2026-09-07T11:17:29",
+  "experiment": {
+    "name": "v3_two_hdb",
+    "algorithm": "task_driven",
+    "vehicles": [
+      {
+        "vehicle_id": "car4",
+        "platform": "ground_vehicle",
+        "address": "10.1.1.84",
+        "execution_override": null
+      },
+      {
+        "vehicle_id": "car5",
+        "platform": "ground_vehicle",
+        "address": "10.1.1.85",
+        "execution_override": null
+      }
+    ],
+    "topology": {
+      "adjacency_matrix": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "formation": {
+        "car4": [
+          0.0,
+          0.0
+        ],
+        "car5": [
+          0.0,
+          0.5
+        ]
+      },
+      "edge_weight_matrix": null
+    },
+    "task_velocity": [
+      0.1,
+      0.0
+    ],
+    "task_velocity_schedule": [
+      [
+        0.0,
+        [
+          0.0,
+          0.0
+        ]
+      ],
+      [
+        3.0,
+        [
+          0.1,
+          0.0
+        ]
+      ]
+    ],
+    "task_modes": [
+      "translate_x",
+      "translate_y"
+    ],
+    "control": {
+      "k": 0.8,
+      "deadband_mps": 0.015
+    },
+    "execution": {
+      "mode": "omni_pid",
+      "heading_hold": true,
+      "k_omega": 2.0,
+      "omega_max": 1.5,
+      "heading_target_rad": 0.0,
+      "heading_deadband_rad": 0.035,
+      "deadzone_mode": "lift",
+      "pwm_period_cycles": 10,
+      "mecanum_l_m": 0.1,
+      "max_wheel_speed_mps": 0.5,
+      "wheel_command_min": -100.0,
+      "wheel_command_max": 100.0,
+      "wheel_command_min_effective": 35.0,
+      "wheel_flip": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "track_width_m": 0.053,
+      "speed_pid": {
+        "kp": 1.2,
+        "ki": 0.0,
+        "kd": 0.0,
+        "integral_limit": 1.0,
+        "output_limit": 0.3
+      },
+      "heading_pid": {
+        "kp": 3.2,
+        "ki": 0.0,
+        "kd": 0.0,
+        "integral_limit": 1.0,
+        "output_limit": 11.32
+      },
+      "omni_velocity_pid": {
+        "kp": 0.6,
+        "ki": 1.2,
+        "kd": 0.0,
+        "integral_limit": 0.1,
+        "output_limit": 0.15
+      }
+    },
+    "runtime": {
+      "control_hz": 50.0,
+      "mocap_prefix": "",
+      "require_twist": false,
+      "max_plausible_speed_mps": 1.0,
+      "velocity_diff_baseline_s": 0.2,
+      "velocity_ema_alpha": 0.3,
+      "stop_on_loss_of_mocap": true,
+      "udp_port": 12345,
+      "udp_timeout_s": 0.2,
+      "command_speed_limit_mps": 0.25,
+      "stop_on_converge": false,
+      "converge_eps_m": 0.03,
+      "converge_hold_s": 3.0,
+      "telemetry": {
+        "console_enabled": true,
+        "console_hz": 10.0,
+        "live_plot_enabled": true,
+        "live_plot_hz": 10.0,
+        "live_plot_queue_size": 64,
+        "live_plot_max_points": 2000,
+        "record_enabled": true,
+        "record_hz": 5.0,
+        "record_root": "runs",
+        "record_flush_interval_s": 1.0
+      }
+    },
+    "preflight": {
+      "min_separation_m": 0.2,
+      "mocap_timeout_s": 10.0,
+      "require_confirmation": true,
+      "formation_warn_m": 0.15
+    },
+    "obstacle_avoidance": {
+      "enabled": false,
+      "vehicle_radius_m": 0.03,
+      "influence_distance_m": 0.1,
+      "repulsive_gain": 0.0005,
+      "min_distance_epsilon_m": 0.01,
+      "avoid_other_vehicles": true
+    },
+    "static_obstacles": [],
+    "constant_velocity": {
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "duration_s": 5.0
+    }
+  }
+}

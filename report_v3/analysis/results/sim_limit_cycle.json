@@ -1,0 +1,376 @@
+{
+  "baseline_modes": {
+    "ideal": {
+      "mean_speed": 0.0998519050244529,
+      "tracking_error_pct": -0.14809497554710283,
+      "ripple_mad_pct": 0.32027296691629337,
+      "flips_per_s": 0.0
+    },
+    "lift": {
+      "mean_speed": 0.09987801497873906,
+      "tracking_error_pct": -0.12198502126094246,
+      "ripple_mad_pct": 4.001307761742447,
+      "flips_per_s": 5.2
+    },
+    "affine": {
+      "mean_speed": 0.09997462529141582,
+      "tracking_error_pct": -0.025374708584186,
+      "ripple_mad_pct": 3.7370252740161836,
+      "flips_per_s": 6.2
+    },
+    "pwm": {
+      "mean_speed": 0.0999300818653022,
+      "tracking_error_pct": -0.06991813469781061,
+      "ripple_mad_pct": 2.7459331746929103,
+      "flips_per_s": 0.0
+    }
+  },
+  "sweeps": {
+    "lift": {
+      "kp=0.2,ki=0.0": {
+        "mean_speed": 0.11999999999905524,
+        "tracking_error_pct": 19.99999999905523,
+        "ripple_mad_pct": 1.3293335876623256e-09,
+        "flips_per_s": 0.0
+      },
+      "kp=0.2,ki=0.4": {
+        "mean_speed": 0.11999999999905524,
+        "tracking_error_pct": 19.99999999905523,
+        "ripple_mad_pct": 1.3293335876623256e-09,
+        "flips_per_s": 0.0
+      },
+      "kp=0.2,ki=0.8": {
+        "mean_speed": 0.11999999999905524,
+        "tracking_error_pct": 19.99999999905523,
+        "ripple_mad_pct": 1.3293335876623256e-09,
+        "flips_per_s": 0.0
+      },
+      "kp=0.2,ki=1.2": {
+        "mean_speed": 0.09990242433920099,
+        "tracking_error_pct": -0.09757566079901525,
+        "ripple_mad_pct": 4.265897505950686,
+        "flips_per_s": 5.6
+      },
+      "kp=0.4,ki=0.0": {
+        "mean_speed": 0.11999999999905524,
+        "tracking_error_pct": 19.99999999905523,
+        "ripple_mad_pct": 1.3293335876623256e-09,
+        "flips_per_s": 0.0
+      },
+      "kp=0.4,ki=0.4": {
+        "mean_speed": 0.11999999999905524,
+        "tracking_error_pct": 19.99999999905523,
+        "ripple_mad_pct": 1.3293335876623256e-09,
+        "flips_per_s": 0.0
+      },
+      "kp=0.4,ki=0.8": {
+        "mean_speed": 0.11999999999905524,
+        "tracking_error_pct": 19.99999999905523,
+        "ripple_mad_pct": 1.3293335876623256e-09,
+        "flips_per_s": 0.0
+      },
+      "kp=0.4,ki=1.2": {
+        "mean_speed": 0.10002828832985586,
+        "tracking_error_pct": 0.02828832985585228,
+        "ripple_mad_pct": 3.7402495893634673,
+        "flips_per_s": 6.266666666666667
+      },
+      "kp=0.6,ki=0.0": {
+        "mean_speed": 0.11999999999905524,
+        "tracking_error_pct": 19.99999999905523,
+        "ripple_mad_pct": 1.3293335876623256e-09,
+        "flips_per_s": 0.0
+      },
+      "kp=0.6,ki=0.4": {
+        "mean_speed": 0.11999999999905524,
+        "tracking_error_pct": 19.99999999905523,
+        "ripple_mad_pct": 1.3293335876623256e-09,
+        "flips_per_s": 0.0
+      },
+      "kp=0.6,ki=0.8": {
+        "mean_speed": 0.11999999999905524,
+        "tracking_error_pct": 19.99999999905523,
+        "ripple_mad_pct": 1.3293335876623256e-09,
+        "flips_per_s": 0.0
+      },
+      "kp=0.6,ki=1.2": {
+        "mean_speed": 0.09987801497873906,
+        "tracking_error_pct": -0.12198502126094246,
+        "ripple_mad_pct": 4.001307761742447,
+        "flips_per_s": 5.2
+      },
+      "kp=1.0,ki=0.0": {
+        "mean_speed": 0.11999999999911223,
+        "tracking_error_pct": 19.999999999112227,
+        "ripple_mad_pct": 1.2491252476913002e-09,
+        "flips_per_s": 0.0
+      },
+      "kp=1.0,ki=0.4": {
+        "mean_speed": 0.1199999999991382,
+        "tracking_error_pct": 19.999999999138193,
+        "ripple_mad_pct": 1.212585895899589e-09,
+        "flips_per_s": 0.0
+      },
+      "kp=1.0,ki=0.8": {
+        "mean_speed": 0.11670182269396863,
+        "tracking_error_pct": 16.701822693968623,
+        "ripple_mad_pct": 1.7278438711818542,
+        "flips_per_s": 1.3333333333333333
+      },
+      "kp=1.0,ki=1.2": {
+        "mean_speed": 0.09982164788746008,
+        "tracking_error_pct": -0.17835211253992844,
+        "ripple_mad_pct": 3.705129190314375,
+        "flips_per_s": 6.266666666666667
+      }
+    },
+    "affine": {
+      "kp=0.2,ki=0.0": {
+        "mean_speed": 0.1752038418756312,
+        "tracking_error_pct": 75.2038418756312,
+        "ripple_mad_pct": 0.026457808229920436,
+        "flips_per_s": 0.0
+      },
+      "kp=0.2,ki=0.4": {
+        "mean_speed": 0.15219499231839892,
+        "tracking_error_pct": 52.19499231839891,
+        "ripple_mad_pct": 0.030457701352673033,
+        "flips_per_s": 0.0
+      },
+      "kp=0.2,ki=0.8": {
+        "mean_speed": 0.1291861427611893,
+        "tracking_error_pct": 29.186142761189302,
+        "ripple_mad_pct": 0.035882405776646226,
+        "flips_per_s": 0.0
+      },
+      "kp=0.2,ki=1.2": {
+        "mean_speed": 0.09978422700629401,
+        "tracking_error_pct": -0.21577299370599545,
+        "ripple_mad_pct": 4.7853316829045065,
+        "flips_per_s": 4.733333333333333
+      },
+      "kp=0.4,ki=0.0": {
+        "mean_speed": 0.16742898415113913,
+        "tracking_error_pct": 67.42898415113912,
+        "ripple_mad_pct": 0.05340929894247547,
+        "flips_per_s": 0.0
+      },
+      "kp=0.4,ki=0.4": {
+        "mean_speed": 0.1467940635162239,
+        "tracking_error_pct": 46.794063516223886,
+        "ripple_mad_pct": 0.060917072880663094,
+        "flips_per_s": 0.0
+      },
+      "kp=0.4,ki=0.8": {
+        "mean_speed": 0.1261591428813108,
+        "tracking_error_pct": 26.1591428813108,
+        "ripple_mad_pct": 0.07088082925061429,
+        "flips_per_s": 0.0
+      },
+      "kp=0.4,ki=1.2": {
+        "mean_speed": 0.09989336535175922,
+        "tracking_error_pct": -0.10663464824078872,
+        "ripple_mad_pct": 3.8905991016161394,
+        "flips_per_s": 5.866666666666666
+      },
+      "kp=0.6,ki=0.0": {
+        "mean_speed": 0.16110846065493215,
+        "tracking_error_pct": 61.10846065493214,
+        "ripple_mad_pct": 0.08049044581288371,
+        "flips_per_s": 0.0
+      },
+      "kp=0.6,ki=0.4": {
+        "mean_speed": 0.14240342468370917,
+        "tracking_error_pct": 42.40342468370917,
+        "ripple_mad_pct": 0.09106306151794984,
+        "flips_per_s": 0.0
+      },
+      "kp=0.6,ki=0.8": {
+        "mean_speed": 0.12369838871248622,
+        "tracking_error_pct": 23.698388712486206,
+        "ripple_mad_pct": 0.1048331506764531,
+        "flips_per_s": 0.0
+      },
+      "kp=0.6,ki=1.2": {
+        "mean_speed": 0.09997462529141582,
+        "tracking_error_pct": -0.025374708584186,
+        "ripple_mad_pct": 3.7370252740161836,
+        "flips_per_s": 6.2
+      },
+      "kp=1.0,ki=0.0": {
+        "mean_speed": 0.1514557611953858,
+        "tracking_error_pct": 51.455761195385804,
+        "ripple_mad_pct": 0.13414728069019696,
+        "flips_per_s": 0.0
+      },
+      "kp=1.0,ki=0.4": {
+        "mean_speed": 0.13569818543781004,
+        "tracking_error_pct": 35.698185437810025,
+        "ripple_mad_pct": 0.14972476193158896,
+        "flips_per_s": 0.0
+      },
+      "kp=1.0,ki=0.8": {
+        "mean_speed": 0.11700010128769076,
+        "tracking_error_pct": 17.00010128769075,
+        "ripple_mad_pct": 1.9673691815739562,
+        "flips_per_s": 2.0
+      },
+      "kp=1.0,ki=1.2": {
+        "mean_speed": 0.09995033134798083,
+        "tracking_error_pct": -0.04966865201917747,
+        "ripple_mad_pct": 3.65149355622661,
+        "flips_per_s": 6.666666666666667
+      }
+    },
+    "pwm": {
+      "kp=0.2,ki=0.0": {
+        "mean_speed": 0.06120593647471577,
+        "tracking_error_pct": -38.79406352528424,
+        "ripple_mad_pct": 6.494755397463228,
+        "flips_per_s": 0.0
+      },
+      "kp=0.2,ki=0.4": {
+        "mean_speed": 0.09602186940246336,
+        "tracking_error_pct": -3.978130597536641,
+        "ripple_mad_pct": 2.3058557250365963,
+        "flips_per_s": 0.0
+      },
+      "kp=0.2,ki=0.8": {
+        "mean_speed": 0.09991880619556293,
+        "tracking_error_pct": -0.08119380443707969,
+        "ripple_mad_pct": 2.757165059891012,
+        "flips_per_s": 0.0
+      },
+      "kp=0.2,ki=1.2": {
+        "mean_speed": 0.09985464871821134,
+        "tracking_error_pct": -0.14535128178866374,
+        "ripple_mad_pct": 2.7231752792445247,
+        "flips_per_s": 0.0
+      },
+      "kp=0.4,ki=0.0": {
+        "mean_speed": 0.0612059364747158,
+        "tracking_error_pct": -38.79406352528421,
+        "ripple_mad_pct": 6.494755397463228,
+        "flips_per_s": 0.0
+      },
+      "kp=0.4,ki=0.4": {
+        "mean_speed": 0.09602186940247816,
+        "tracking_error_pct": -3.9781305975218477,
+        "ripple_mad_pct": 2.305855725036012,
+        "flips_per_s": 0.0
+      },
+      "kp=0.4,ki=0.8": {
+        "mean_speed": 0.09984398278684883,
+        "tracking_error_pct": -0.15601721315117167,
+        "ripple_mad_pct": 2.75069752948491,
+        "flips_per_s": 0.0
+      },
+      "kp=0.4,ki=1.2": {
+        "mean_speed": 0.09987148028196798,
+        "tracking_error_pct": -0.12851971803203022,
+        "ripple_mad_pct": 2.836457095974177,
+        "flips_per_s": 0.0
+      },
+      "kp=0.6,ki=0.0": {
+        "mean_speed": 0.06305869111865668,
+        "tracking_error_pct": -36.94130888134332,
+        "ripple_mad_pct": 6.5040469712960185,
+        "flips_per_s": 0.0
+      },
+      "kp=0.6,ki=0.4": {
+        "mean_speed": 0.09602186940086983,
+        "tracking_error_pct": -3.9781305991301723,
+        "ripple_mad_pct": 2.3058557250995797,
+        "flips_per_s": 0.0
+      },
+      "kp=0.6,ki=0.8": {
+        "mean_speed": 0.09975002506505641,
+        "tracking_error_pct": -0.2499749349435948,
+        "ripple_mad_pct": 2.7372533661950786,
+        "flips_per_s": 0.0
+      },
+      "kp=0.6,ki=1.2": {
+        "mean_speed": 0.0999300818653022,
+        "tracking_error_pct": -0.06991813469781061,
+        "ripple_mad_pct": 2.7459331746929103,
+        "flips_per_s": 0.0
+      },
+      "kp=1.0,ki=0.0": {
+        "mean_speed": 0.07483161449026847,
+        "tracking_error_pct": -25.168385509731536,
+        "ripple_mad_pct": 4.885086562346452,
+        "flips_per_s": 0.0
+      },
+      "kp=1.0,ki=0.4": {
+        "mean_speed": 0.09602186912645944,
+        "tracking_error_pct": -3.9781308735405694,
+        "ripple_mad_pct": 2.3058557359453813,
+        "flips_per_s": 0.0
+      },
+      "kp=1.0,ki=0.8": {
+        "mean_speed": 0.09997065982375544,
+        "tracking_error_pct": -0.02934017624456331,
+        "ripple_mad_pct": 2.758359800776583,
+        "flips_per_s": 0.0
+      },
+      "kp=1.0,ki=1.2": {
+        "mean_speed": 0.09995308184018745,
+        "tracking_error_pct": -0.04691815981255898,
+        "ripple_mad_pct": 2.7342986479113716,
+        "flips_per_s": 0.0
+      }
+    },
+    "pwm_period": {
+      "4": {
+        "mean_speed": 0.09988283028220242,
+        "tracking_error_pct": -0.11716971779758556,
+        "ripple_mad_pct": 3.129461052966339,
+        "flips_per_s": 0.0
+      },
+      "6": {
+        "mean_speed": 0.09989566780767759,
+        "tracking_error_pct": -0.10433219232242052,
+        "ripple_mad_pct": 2.969899472121219,
+        "flips_per_s": 0.0
+      },
+      "10": {
+        "mean_speed": 0.0999300818653022,
+        "tracking_error_pct": -0.06991813469781061,
+        "ripple_mad_pct": 2.7459331746929103,
+        "flips_per_s": 0.0
+      },
+      "20": {
+        "mean_speed": 0.09981094870296851,
+        "tracking_error_pct": -0.18905129703149226,
+        "ripple_mad_pct": 4.016400700344777,
+        "flips_per_s": 0.0
+      }
+    },
+    "tau_est": {
+      "0.05": {
+        "mean_speed": 0.09995639873985393,
+        "tracking_error_pct": -0.04360126014607557,
+        "ripple_mad_pct": 2.7267512493497033,
+        "flips_per_s": 0.0
+      },
+      "0.08": {
+        "mean_speed": 0.09991392768987553,
+        "tracking_error_pct": -0.08607231012447425,
+        "ripple_mad_pct": 2.6921642875687284,
+        "flips_per_s": 0.0
+      },
+      "0.12": {
+        "mean_speed": 0.0998831037225129,
+        "tracking_error_pct": -0.11689627748710796,
+        "ripple_mad_pct": 2.726795000685942,
+        "flips_per_s": 0.0
+      },
+      "0.2": {
+        "mean_speed": 0.09985527492708068,
+        "tracking_error_pct": -0.14472507291932168,
+        "ripple_mad_pct": 2.8918310813522576,
+        "flips_per_s": 0.0
+      }
+    }
+  }
+}

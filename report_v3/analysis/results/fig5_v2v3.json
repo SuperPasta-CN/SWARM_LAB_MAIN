@@ -1,0 +1,51 @@
+{
+  "v2 3 cars 1626": {
+    "run": "crew_three_20260814_151626_079481",
+    "shape_residual_mean_mm": 26.186293072868256,
+    "shape_residual_std_mm": 8.402766427305433,
+    "fitted_scale_mean": 1.3035530428831832,
+    "fitted_rotation_mean_deg": 1.020343962073748
+  },
+  "v2 4 cars 2418": {
+    "run": "crew_four_20260814_152418_978476",
+    "shape_residual_mean_mm": 48.23944175538172,
+    "shape_residual_std_mm": 6.3952446277789265,
+    "fitted_scale_mean": 0.7589975589224225,
+    "fitted_rotation_mean_deg": 1.6940670165170488
+  },
+  "v2 4 cars 2811": {
+    "run": "crew_four_20260814_152811_341988",
+    "shape_residual_mean_mm": 29.182736184630418,
+    "shape_residual_std_mm": 8.120795310082842,
+    "fitted_scale_mean": 0.6397517939647015,
+    "fitted_rotation_mean_deg": -0.7054715286466646
+  },
+  "v3 3 cars 3912": {
+    "run": "v3_three_20260904_153912_199619",
+    "shape_residual_mean_mm": 9.602554427779681,
+    "shape_residual_std_mm": 3.991051158721109,
+    "fitted_scale_mean": 0.9999638679916277,
+    "fitted_rotation_mean_deg": 0.05706106326755953
+  },
+  "v3 3 cars 4418": {
+    "run": "v3_three_20260904_154418_357386",
+    "shape_residual_mean_mm": 12.026641505581447,
+    "shape_residual_std_mm": 5.222455433946636,
+    "fitted_scale_mean": 0.9908965873223617,
+    "fitted_rotation_mean_deg": -0.4900037882336514
+  },
+  "v3 4 cars 4632": {
+    "run": "v3_four_20260904_154632_535713",
+    "shape_residual_mean_mm": 11.494998859383951,
+    "shape_residual_std_mm": 4.265140428258117,
+    "fitted_scale_mean": 1.0005018532167176,
+    "fitted_rotation_mean_deg": 0.023498480078461052
+  },
+  "v3 4 cars 4751": {
+    "run": "v3_four_20260904_154751_276804",
+    "shape_residual_mean_mm": 12.272464502109624,
+    "shape_residual_std_mm": 3.8468804653197997,
+    "fitted_scale_mean": 0.9985481295216619,
+    "fitted_rotation_mean_deg": -0.003135956940440529
+  }
+}

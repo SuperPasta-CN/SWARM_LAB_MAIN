@@ -1,0 +1,32 @@
+{
+  "2 cars": {
+    "run": "v3_two_20260904_153022_135638",
+    "cruise_window_s": [
+      0.0,
+      24.882084
+    ],
+    "centroid_vx_mps": 0.09407464142373083,
+    "centroid_vy_mps": 0.003650385942596487,
+    "achievement_pct": 94.07464142373082
+  },
+  "3 cars": {
+    "run": "v3_three_20260904_154418_357386",
+    "cruise_window_s": [
+      0.0,
+      24.081792
+    ],
+    "centroid_vx_mps": 0.08975436801656068,
+    "centroid_vy_mps": 0.0006670261676495039,
+    "achievement_pct": 89.75436801656068
+  },
+  "4 cars": {
+    "run": "v3_four_20260904_154751_276804",
+    "cruise_window_s": [
+      0.0,
+      28.541502
+    ],
+    "centroid_vx_mps": 0.09892852787301547,
+    "centroid_vy_mps": 0.00020589216743682477,
+    "achievement_pct": 98.92852787301545
+  }
+}

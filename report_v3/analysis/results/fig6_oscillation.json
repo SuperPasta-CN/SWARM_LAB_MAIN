@@ -1,0 +1,156 @@
+{
+  "v3_two_20260904_152305_491918": {
+    "car4": {
+      "yaw_wobble_median_deg": 9.702987779532366,
+      "yaw_wobble_p95_deg": 97.83987256359437,
+      "speed_ripple_median_pct": 30.500711695390333,
+      "speed_ripple_p95_pct": 87.27313372127537,
+      "wheel_sign_flips_per_s_per_wheel": 1.288258394050802
+    },
+    "car5": {
+      "yaw_wobble_median_deg": 6.573325711437797,
+      "yaw_wobble_p95_deg": 60.416384033242444,
+      "speed_ripple_median_pct": 50.242807898251925,
+      "speed_ripple_p95_pct": 99.65938925648356,
+      "wheel_sign_flips_per_s_per_wheel": 2.5346222061812522
+    }
+  },
+  "v3_two_20260904_152637_829407": {
+    "car4": {
+      "yaw_wobble_median_deg": 2.251558342821289,
+      "yaw_wobble_p95_deg": 116.38256170266841,
+      "speed_ripple_median_pct": 53.77309817472463,
+      "speed_ripple_p95_pct": 98.02706451663774,
+      "wheel_sign_flips_per_s_per_wheel": 2.255331960860521
+    },
+    "car5": {
+      "yaw_wobble_median_deg": 9.814832250254916,
+      "yaw_wobble_p95_deg": 104.56702422289186,
+      "speed_ripple_median_pct": 59.45516660229527,
+      "speed_ripple_p95_pct": 112.10649291560762,
+      "wheel_sign_flips_per_s_per_wheel": 2.3146828019357977
+    }
+  },
+  "v3_two_20260904_153022_135638": {
+    "car4": {
+      "yaw_wobble_median_deg": 1.6934585486137754,
+      "yaw_wobble_p95_deg": 5.639246996341216,
+      "speed_ripple_median_pct": 60.845936596756935,
+      "speed_ripple_p95_pct": 114.80688422542953,
+      "wheel_sign_flips_per_s_per_wheel": 2.351089241560313
+    },
+    "car5": {
+      "yaw_wobble_median_deg": 2.0713020354911293,
+      "yaw_wobble_p95_deg": 12.381562967311266,
+      "speed_ripple_median_pct": 67.21480095002308,
+      "speed_ripple_p95_pct": 110.45124241714403,
+      "wheel_sign_flips_per_s_per_wheel": 2.632416159353855
+    }
+  },
+  "v3_three_20260904_153912_199619": {
+    "car2": {
+      "yaw_wobble_median_deg": 11.242208330467793,
+      "yaw_wobble_p95_deg": 101.36875018948862,
+      "speed_ripple_median_pct": 58.576833914502494,
+      "speed_ripple_p95_pct": 111.95139835230003,
+      "wheel_sign_flips_per_s_per_wheel": 2.4394923186555713
+    },
+    "car4": {
+      "yaw_wobble_median_deg": 2.307758763455126,
+      "yaw_wobble_p95_deg": 10.994143999861091,
+      "speed_ripple_median_pct": 45.05812718904006,
+      "speed_ripple_p95_pct": 88.90664591902359,
+      "wheel_sign_flips_per_s_per_wheel": 1.5982880708433054
+    },
+    "car5": {
+      "yaw_wobble_median_deg": 1.6172918309525959,
+      "yaw_wobble_p95_deg": 11.940207404771483,
+      "speed_ripple_median_pct": 66.35563156687205,
+      "speed_ripple_p95_pct": 135.15189074239365,
+      "wheel_sign_flips_per_s_per_wheel": 2.663813451405509
+    }
+  },
+  "v3_three_20260904_154418_357386": {
+    "car2": {
+      "yaw_wobble_median_deg": 2.1518795545549794,
+      "yaw_wobble_p95_deg": 9.07315242395581,
+      "speed_ripple_median_pct": 54.98897310332453,
+      "speed_ripple_p95_pct": 110.20053873204093,
+      "wheel_sign_flips_per_s_per_wheel": 2.408458639622832
+    },
+    "car4": {
+      "yaw_wobble_median_deg": 6.522694301753244,
+      "yaw_wobble_p95_deg": 55.411808816487735,
+      "speed_ripple_median_pct": 50.46353953781797,
+      "speed_ripple_p95_pct": 112.41835277844052,
+      "wheel_sign_flips_per_s_per_wheel": 2.2423580437867745
+    },
+    "car5": {
+      "yaw_wobble_median_deg": 10.236289215679774,
+      "yaw_wobble_p95_deg": 115.2703449908451,
+      "speed_ripple_median_pct": 69.02794789152843,
+      "speed_ripple_p95_pct": 131.38752124744826,
+      "wheel_sign_flips_per_s_per_wheel": 2.5745592354588895
+    }
+  },
+  "v3_four_20260904_154632_535713": {
+    "car1": {
+      "yaw_wobble_median_deg": 8.890758652955702,
+      "yaw_wobble_p95_deg": 96.15326085826695,
+      "speed_ripple_median_pct": 68.6672232087101,
+      "speed_ripple_p95_pct": 126.40286896421789,
+      "wheel_sign_flips_per_s_per_wheel": 2.758758151914811
+    },
+    "car2": {
+      "yaw_wobble_median_deg": 6.3447462716357395,
+      "yaw_wobble_p95_deg": 55.16702858535773,
+      "speed_ripple_median_pct": 58.273182643712516,
+      "speed_ripple_p95_pct": 106.5131582881638,
+      "wheel_sign_flips_per_s_per_wheel": 2.773126683956034
+    },
+    "car4": {
+      "yaw_wobble_median_deg": 3.4607632098447403,
+      "yaw_wobble_p95_deg": 19.989482612387643,
+      "speed_ripple_median_pct": 56.402160611645435,
+      "speed_ripple_p95_pct": 119.51653796826191,
+      "wheel_sign_flips_per_s_per_wheel": 2.3277021906781217
+    },
+    "car5": {
+      "yaw_wobble_median_deg": 2.5745469966618337,
+      "yaw_wobble_p95_deg": 12.754824220504316,
+      "speed_ripple_median_pct": 66.65285232312374,
+      "speed_ripple_p95_pct": 103.55617277225579,
+      "wheel_sign_flips_per_s_per_wheel": 2.6294413635438043
+    }
+  },
+  "v3_four_20260904_154751_276804": {
+    "car1": {
+      "yaw_wobble_median_deg": 2.056554535272326,
+      "yaw_wobble_p95_deg": 9.357624180426368,
+      "speed_ripple_median_pct": 64.87039778425014,
+      "speed_ripple_p95_pct": 129.9662201325899,
+      "wheel_sign_flips_per_s_per_wheel": 2.6803074344160303
+    },
+    "car2": {
+      "yaw_wobble_median_deg": 6.572744256588371,
+      "yaw_wobble_p95_deg": 19.090894824013898,
+      "speed_ripple_median_pct": 76.95287476858482,
+      "speed_ripple_p95_pct": 145.30509819703371,
+      "wheel_sign_flips_per_s_per_wheel": 2.1372386078350045
+    },
+    "car4": {
+      "yaw_wobble_median_deg": 7.103078833658322,
+      "yaw_wobble_p95_deg": 32.1065430309859,
+      "speed_ripple_median_pct": 65.09722316854071,
+      "speed_ripple_p95_pct": 103.46588178519669,
+      "wheel_sign_flips_per_s_per_wheel": 2.102201909345906
+    },
+    "car5": {
+      "yaw_wobble_median_deg": 6.451094422414162,
+      "yaw_wobble_p95_deg": 16.43534236880486,
+      "speed_ripple_median_pct": 62.69855948059829,
+      "speed_ripple_p95_pct": 135.533823186534,
+      "wheel_sign_flips_per_s_per_wheel": 2.277385401791398
+    }
+  }
+}

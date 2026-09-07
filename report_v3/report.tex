@@ -270,10 +270,30 @@ car4：$v(35)=0.201$\,m/s、car5：$v(35)=0.283$\,m/s——同指令下增益差
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{analysis/figs/fig9_ab_comparison.png}
-\caption{振荡治理四项指标的组间对比：基线 / affine / 未标定 PWM /
-归一化 PWM（$w{=}0.1$ 与 $w{=}0.2$）。}
-\label{fig:ab}
+\includegraphics[width=\linewidth]{analysis/figs/fig10_waveforms.png}
+\caption{振荡演进波形（同轴对比，蓝=实际车速，红=前轮指令）：
+基线 lift 的 $\pm35$ bang-bang；affine 去量化后振荡依旧；PWM 的载波脉冲；
+归一化 PWM（本轮最好）指令与速度双双走平。}
+\label{fig:wave}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{analysis/figs/fig11_ab_matrix.png}
+\caption{09-07 死区策略 A/B 全指标矩阵（6 组 × 4 指标；绿=PWM 组）：
+换向率、波纹、yaw 摆动、稳态边误差——PWM 全部最优或并列最优，
+affine 全线持平或变差（\file{results/fig10\_12\_arc.json}）。}
+\label{fig:abmatrix}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{analysis/figs/fig12_von.png}
+\caption{逐车 $v_{on}$ 归一化（\file{results/fig10\_12\_arc.json}）：
+(a) 标定数据（静摩擦指令与 $v(35)$，car4/car5 增益差 41\%）；
+(b) 归一化前后逐车速度达成率（95--100\% 命中）；
+(c)(d) 两档巡航速度下边误差 RMS 曲线（前=红，后=绿）。}
+\label{fig:von}
 \end{figure}
 
 \section{命题—指标—结果—证据总表}
@@ -348,12 +368,14 @@ P7 & 振荡（已治理） & 低速死区 $\to$ PWM 时间平均 $+$ 逐车 $v_{
         \file{fig3\_decoupling.png}、\file{fig4\_startup.png}、
         \file{fig5\_v2v3.png}、\file{fig6\_oscillation.png}、
         \file{fig7\_oscillation\_attribution.png}、\file{fig8\_sim\_limit\_cycle.png}、
-        \file{fig9\_ab\_comparison.png}。
+        \file{fig9\_ab\_comparison.png}、\file{fig10\_waveforms.png}、
+        \file{fig11\_ab\_matrix.png}、\file{fig12\_von.png}。
   \item 数值结果：\file{results/fig1\_convergence.json}、
         \file{fig2\_scale\_lock.json}、\file{fig3\_decoupling.json}、
         \file{fig4\_startup.json}、\file{fig5\_v2v3.json}、
         \file{fig6\_oscillation.json}、\file{fig7\_oscillation\_attribution.json}、
-        \file{sim\_limit\_cycle.json}、\file{fig9\_ab\_comparison.json}。
+        \file{sim\_limit\_cycle.json}、\file{fig9\_ab\_comparison.json}、
+        \file{fig10\_12\_arc.json}。
   \item 数据说明与判读口径：\file{report\_v3/README.md}；振荡专题：
         \file{oscillation\_analysis.md}（初版归因）、
         \file{oscillation\_reanalysis.md}（09-07 修正版）。

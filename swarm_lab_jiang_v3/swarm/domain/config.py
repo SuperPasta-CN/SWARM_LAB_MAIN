@@ -13,6 +13,7 @@ mode velocities ``w`` support a piecewise-constant schedule.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from math import sqrt
 from typing import Mapping, Optional, Sequence, Tuple
@@ -318,6 +319,21 @@ class ExperimentConfig:
                 raise ValueError(
                     "task_velocity_schedule speeds must not exceed "
                     "command_speed_limit_mps"
+                )
+        # Consistency guard: when a schedule exists, its final entry (not the
+        # base task_velocity) is the effective cruise speed — warn loudly
+        # instead of silently ignoring the base value (09-07 field incident).
+        if self.task_velocity_schedule:
+            final = tuple(float(v) for v in self.task_velocity_schedule[-1][1])
+            base = tuple(float(v) for v in self.task_velocity)
+            if final != base:
+                warnings.warn(
+                    "task_velocity %s differs from the final scheduled velocity %s: "
+                    "the schedule takes precedence after its last entry, so %s is "
+                    "the effective cruise speed (align both to change cruise speed)"
+                    % (base, final, final),
+                    UserWarning,
+                    stacklevel=3,
                 )
 
     def validate(self) -> None:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import unittest
+import warnings
 from dataclasses import replace
 
 from swarm.application.planner_factory import available_algorithms, build_swarm_planner
@@ -176,6 +177,25 @@ class ValidationTests(unittest.TestCase):
         )
         with self.assertRaises(ValueError):
             replace(config, topology=bad_topology).validate()
+
+    def test_base_schedule_mismatch_warns(self) -> None:
+        config = replace(
+            _minimal_config(),
+            task_velocity=(0.20, 0.0),
+            task_velocity_schedule=((0.0, (0.0, 0.0)), (3.0, (0.10, 0.0))),
+        )
+        with self.assertWarnsRegex(UserWarning, "differs from the final scheduled"):
+            config.validate()
+
+    def test_matching_base_and_schedule_final_no_warning(self) -> None:
+        config = replace(
+            _minimal_config(),
+            task_velocity=(0.10, 0.0),
+            task_velocity_schedule=((0.0, (0.0, 0.0)), (3.0, (0.10, 0.0))),
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            config.validate()
 
     def test_invalid_execution_mode_rejected(self) -> None:
         config = replace(_minimal_config(), execution=ExecutionConfig(mode="hover"))

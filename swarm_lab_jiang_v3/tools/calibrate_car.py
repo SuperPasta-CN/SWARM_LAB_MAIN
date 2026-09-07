@@ -153,6 +153,11 @@ def write_overrides_module(calibrations_dir: Path, out_path: Path) -> dict:
         "Regenerated on every calibration run; edit by re-running the tool,",
         "not by hand.  Usage in experiment configs:",
         "    execution_override=CALIBRATED_OVERRIDES.get(\"carX\")",
+        "",
+        "Consistency rule: in each override entry, wheel_command_min_effective is",
+        "the PWM ON amplitude and pwm_v_on_mps is the speed measured AT that same",
+        "amplitude — never mix levels.  STICTION_MIN_EFFECTIVE keeps the",
+        "ramp-measured threshold (for lift mode / lower-amplitude future work).",
         '"""',
         "",
         "from swarm.domain.config import VehicleExecutionOverride",
@@ -161,8 +166,17 @@ def write_overrides_module(calibrations_dir: Path, out_path: Path) -> dict:
     ]
     for vehicle_id, record in results.items():
         lines.append(
-            '    "%s": VehicleExecutionOverride(wheel_command_min_effective=%.1f),'
-            % (vehicle_id, record["wheel_command_min_effective"])
+            '    "%s": VehicleExecutionOverride('
+            "wheel_command_min_effective=%.1f, pwm_v_on_mps=%.3f),"
+            % (vehicle_id, record["speed_cmd"], record["v35_median_mps"])
+        )
+    lines.append("}")
+    lines.append("")
+    lines.append("# Ramp-measured stiction thresholds + margin (lift mode / future use)")
+    lines.append("STICTION_MIN_EFFECTIVE = {")
+    for vehicle_id, record in results.items():
+        lines.append(
+            '    "%s": %.1f,' % (vehicle_id, record["wheel_command_min_effective"])
         )
     lines.append("}")
     lines.append("")

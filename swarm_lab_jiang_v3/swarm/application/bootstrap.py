@@ -95,6 +95,7 @@ def _vehicle_execution(config: ExperimentConfig, vehicle: VehicleConfig) -> Exec
             "max_wheel_speed_mps",
             "wheel_command_min_effective",
             "wheel_flip",
+            "pwm_v_on_mps",
         )
         if getattr(override, field) is not None
     }
@@ -203,6 +204,8 @@ def build_control_loop(config: ExperimentConfig, assume_yes: bool = False) -> Co
                     min_effective=execution.wheel_command_min_effective,
                     command_max=execution.wheel_command_max,
                     pwm_period_cycles=execution.pwm_period_cycles,
+                    v_on_mps=execution.pwm_v_on_mps,
+                    calib_mps=execution.max_wheel_speed_mps,
                 ),
             )
         return ControlLoop(

@@ -33,13 +33,29 @@ from swarm.domain.config import (
     VehicleConfig,
 )
 
+try:
+    # 逐车标定参数（tools/calibrate_car.py 自动生成；不存在时回退全局参数）
+    from configs.calibrated_overrides import CALIBRATED_OVERRIDES
+except ImportError:
+    CALIBRATED_OVERRIDES = {}
+
 
 CONFIG = ExperimentConfig(
     name="v3_two",
     algorithm="task_driven",
     vehicles=(
-        VehicleConfig("car4", "ground_vehicle", "10.1.1.84"),
-        VehicleConfig("car5", "ground_vehicle", "10.1.1.85"),
+        VehicleConfig(
+            "car4",
+            "ground_vehicle",
+            "10.1.1.84",
+            execution_override=CALIBRATED_OVERRIDES.get("car4"),
+        ),
+        VehicleConfig(
+            "car5",
+            "ground_vehicle",
+            "10.1.1.85",
+            execution_override=CALIBRATED_OVERRIDES.get("car5"),
+        ),
     ),
     topology=TopologyConfig(
         adjacency_matrix=((0, 1), (1, 0)),

@@ -92,6 +92,11 @@ class ExecutionConfig:
     deadzone_mode: str = "pwm"
     # pwm 模式的载波周期（控制拍数；50 Hz 下 10 拍 = 5 Hz 载波）。
     pwm_period_cycles: int = 10
+    # PWM 占空比归一化：ON 拍幅值（wheel_command_min_effective）处实测的
+    # 持续车速（m/s），由 tools/calibrate_car.py 测得。设置后占空比按
+    # duty = (指令×calib/100)/v_on 归一化，逐车消除速度增益差异；
+    # None = 旧行为（duty = 指令/min_eff，假定各车增益一致）。
+    pwm_v_on_mps: Optional[float] = None
     mecanum_l_m: float = 0.10  # lx + ly of the X-pattern mecanum chassis
     # Wheel-speed <-> command calibration: command 100 corresponds to this
     # wheel speed (m/s).  Measure it (full command for 2 s, distance / time).
@@ -133,6 +138,8 @@ class VehicleExecutionOverride:
     max_wheel_speed_mps: Optional[float] = None
     wheel_command_min_effective: Optional[float] = None
     wheel_flip: Optional[Tuple[float, float, float, float]] = None
+    # Per-vehicle measured speed at the PWM ON amplitude (see ExecutionConfig).
+    pwm_v_on_mps: Optional[float] = None
 
 
 @dataclass(frozen=True)
@@ -389,6 +396,8 @@ class ExperimentConfig:
             raise ValueError("deadzone_mode must be 'lift', 'affine' or 'pwm'")
         if execution.pwm_period_cycles < 1:
             raise ValueError("pwm_period_cycles must be >= 1")
+        if execution.pwm_v_on_mps is not None and execution.pwm_v_on_mps <= 0.0:
+            raise ValueError("pwm_v_on_mps must be positive when set")
         if execution.wheel_command_min >= execution.wheel_command_max:
             raise ValueError("wheel_command_min must be less than wheel_command_max")
         if len(execution.wheel_flip) != 4:
@@ -417,6 +426,10 @@ class ExperimentConfig:
                     raise ValueError("execution_override.wheel_flip must contain four signs")
                 if any(sign not in (-1.0, 1.0, -1, 1) for sign in override.wheel_flip):
                     raise ValueError("execution_override.wheel_flip entries must be +1 or -1")
+            if override.pwm_v_on_mps is not None and override.pwm_v_on_mps <= 0.0:
+                raise ValueError(
+                    "execution_override.pwm_v_on_mps must be positive when set"
+                )
         if self.runtime.converge_eps_m <= 0.0:
             raise ValueError("converge_eps_m must be positive")
         if self.runtime.converge_hold_s <= 0.0:

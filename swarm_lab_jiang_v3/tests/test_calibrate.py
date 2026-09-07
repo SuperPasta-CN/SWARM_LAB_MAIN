@@ -69,6 +69,7 @@ class OverridesModuleTests(unittest.TestCase):
                 record = {
                     "vehicle_id": vehicle_id,
                     "wheel_command_min_effective": min_eff,
+                    "speed_cmd": 35.0,
                     "v35_median_mps": v35,
                 }
                 with (cal_dir / ("%s.json" % vehicle_id)).open("w", encoding="utf-8") as out:
@@ -77,7 +78,14 @@ class OverridesModuleTests(unittest.TestCase):
             results = cal.write_overrides_module(cal_dir, out_path)
             content = out_path.read_text(encoding="utf-8")
             self.assertEqual(set(results), {"car4", "car5"})
-            self.assertIn('"car4": VehicleExecutionOverride(wheel_command_min_effective=36.0)', content)
+            # consistent pair: pwm amplitude == v_on measurement level (35)
+            self.assertIn(
+                '"car4": VehicleExecutionOverride('
+                "wheel_command_min_effective=35.0, pwm_v_on_mps=0.145)",
+                content,
+            )
+            # ramp-measured threshold kept separately for lift/reference
+            self.assertIn('"car4": 36.0,', content)
             self.assertIn('"car5": 0.132', content)
             # generated module must be valid python
             namespace = {}

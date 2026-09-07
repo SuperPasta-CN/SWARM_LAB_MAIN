@@ -66,15 +66,21 @@ class DeadzoneCompensator:
         min_effective: float = 0.0,
         command_max: float = 100.0,
         pwm_period_cycles: int = 10,
+        v_on_mps: Optional[float] = None,
+        calib_mps: float = 0.5,
     ) -> None:
         if mode not in ("lift", "affine", "pwm"):
             raise ValueError("deadzone_mode must be 'lift', 'affine' or 'pwm'")
         if pwm_period_cycles < 1:
             raise ValueError("pwm_period_cycles must be >= 1")
+        if v_on_mps is not None and v_on_mps <= 0.0:
+            raise ValueError("pwm_v_on_mps must be positive when set")
         self.mode = mode
         self.min_effective = min_effective
         self.command_max = command_max
         self.pwm_period_cycles = pwm_period_cycles
+        self.v_on_mps = v_on_mps
+        self.calib_mps = calib_mps
         self._cycle = 0
 
     def apply(self, values):
@@ -105,7 +111,15 @@ class DeadzoneCompensator:
         strongest = max(abs(command) for command in commands.values())
         if strongest == 0.0 or strongest >= self.min_effective:
             return values  # exact zeros stay zero; beyond-threshold pass through
-        duty = strongest / self.min_effective
+        if self.v_on_mps is not None:
+            # Per-vehicle normalized duty: the average speed equals the
+            # intended speed (strongest * calib/100) regardless of how
+            # strong this chassis is at the ON amplitude.
+            duty = (strongest * self.calib_mps / 100.0) / self.v_on_mps
+        else:
+            duty = strongest / self.min_effective
+        if duty >= 1.0:
+            return values
         on = self._cycle < duty * self.pwm_period_cycles
         if not on:
             out = dict(values)

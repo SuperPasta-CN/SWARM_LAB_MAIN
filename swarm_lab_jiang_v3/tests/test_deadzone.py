@@ -93,6 +93,31 @@ class PwmModeTests(unittest.TestCase):
         self.assertAlmostEqual(abs(seen_on["front_right"]), 35.0)
 
 
+class PwmVonTests(unittest.TestCase):
+    """Per-vehicle duty normalization with measured v_on."""
+
+    def test_duty_normalized_by_v_on(self) -> None:
+        # car5 calibration: v_on=0.283 m/s at cmd 35 -> duty for c=20 is
+        # (20*0.5/100)/0.283 ~= 0.353 -> ~3-4 ON cycles per 10.
+        comp = DeadzoneCompensator(
+            mode="pwm", min_effective=35.0, v_on_mps=0.283, calib_mps=0.5,
+            pwm_period_cycles=10,
+        )
+        on_count = sum(
+            1 for _ in range(10) if comp.apply(_values(fl=20.0))["front_left"] != 0.0
+        )
+        self.assertIn(on_count, (3, 4))
+
+    def test_duty_ge_one_passes_through(self) -> None:
+        comp = DeadzoneCompensator(mode="pwm", min_effective=35.0, v_on_mps=0.05)
+        out = comp.apply(_values(fl=20.0))
+        self.assertEqual(out["front_left"], 20.0)
+
+    def test_invalid_v_on_rejected(self) -> None:
+        with self.assertRaises(ValueError):
+            DeadzoneCompensator(mode="pwm", min_effective=35.0, v_on_mps=0.0)
+
+
 class DeadzoneConfigValidationTests(unittest.TestCase):
     def test_invalid_mode_rejected(self) -> None:
         from dataclasses import replace

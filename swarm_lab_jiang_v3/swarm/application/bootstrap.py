@@ -26,7 +26,7 @@ from swarm.application.preflight import (
     wait_for_mocap,
 )
 from swarm.domain.config import ExecutionConfig, ExperimentConfig, VehicleConfig
-from swarm.infrastructure.ground_vehicle import GroundVehicleActuator
+from swarm.infrastructure.ground_vehicle import DeadzoneCompensator, GroundVehicleActuator
 from swarm.infrastructure.telemetry.composite import CompositeTelemetrySink
 from swarm.infrastructure.telemetry.console import ConsoleTelemetrySink
 from swarm.infrastructure.telemetry.live_plot import LiveTrajectoryPlotSink
@@ -171,6 +171,7 @@ def build_control_loop(config: ExperimentConfig, assume_yes: bool = False) -> Co
         require_twist=config.runtime.require_twist,
         max_plausible_speed_mps=config.runtime.max_plausible_speed_mps,
         velocity_diff_baseline_s=config.runtime.velocity_diff_baseline_s,
+        velocity_ema_alpha=config.runtime.velocity_ema_alpha,
     )
     try:
         planner = build_swarm_planner(config)
@@ -197,6 +198,12 @@ def build_control_loop(config: ExperimentConfig, assume_yes: bool = False) -> Co
                 controller=_build_vehicle_controller(config, vehicle),
                 driver=ChassisSocketDriver(vehicle.address, socket_config),
                 min_command=execution.wheel_command_min_effective,
+                compensator=DeadzoneCompensator(
+                    mode=execution.deadzone_mode,
+                    min_effective=execution.wheel_command_min_effective,
+                    command_max=execution.wheel_command_max,
+                    pwm_period_cycles=execution.pwm_period_cycles,
+                ),
             )
         return ControlLoop(
             control_hz=config.runtime.control_hz,

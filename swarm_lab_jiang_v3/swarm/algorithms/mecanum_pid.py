@@ -64,6 +64,10 @@ class MecanumPidController:
             # Captured when the first command arrives (experiment unlock).
             self.state.yaw_target = yaw
         error = wrap_to_pi(self.state.yaw_target - yaw)
+        # Heading deadband: suppress micro-corrections that would otherwise
+        # be lifted by the dead-zone compensation into a rotation limit cycle.
+        if abs(error) < self.config.heading_deadband_rad:
+            return 0.0
         omega = self.config.k_omega * error
         return max(-self.config.omega_max, min(self.config.omega_max, omega))
 

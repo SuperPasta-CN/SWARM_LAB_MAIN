@@ -97,25 +97,25 @@ class ManeuverDecouplingTests(unittest.TestCase):
     def test_translation_at_w_with_decaying_error(self) -> None:
         config = replace(CONFIG, task_velocity_schedule=())  # constant w
         config.validate()
-        positions = {"car6": [0.3, -0.4], "car5": [0.1, 1.5]}  # off formation
+        positions = {"car4": [0.3, -0.4], "car5": [0.1, 1.5]}  # off formation
         duration = 20.0
         rms_history, _, final = _run(config, positions, duration)
         # The formation translated by w * T (decoupling: task not fought).
         # (delta absorbs the brief initial saturation, where the per-car
         # limiter partially masks the task term.)
-        centroid_x = (final["car6"][0] + final["car5"][0]) / 2
+        centroid_x = (final["car4"][0] + final["car5"][0]) / 2
         self.assertAlmostEqual(centroid_x, 0.2 + 0.10 * duration, delta=0.1)
         self.assertLess(rms_history[-1], ERROR_FLOOR_M)
 
     def test_scale_error_corrected_under_active_task(self) -> None:
         config = replace(CONFIG, task_velocity_schedule=())
         # Start with the separation doubled (a mode outside null(L_A)).
-        positions = {"car6": [0.0, 0.0], "car5": [0.0, 1.6]}
+        positions = {"car4": [0.0, 0.0], "car5": [0.0, 1.0]}
         rms_history, _, final = _run(config, positions, 15.0)
         self.assertLess(rms_history[-1], ERROR_FLOOR_M)
-        # separation back to the desired 0.8 m within the deadband floor
+        # separation back to the desired 0.5 m within the deadband floor
         # (the constraint freezes once k*|e| < deadband: |e| < ~0.019 m)
-        self.assertAlmostEqual(final["car5"][1] - final["car6"][1], 0.8, delta=0.025)
+        self.assertAlmostEqual(final["car5"][1] - final["car4"][1], 0.5, delta=0.025)
 
 
 if __name__ == "__main__":

@@ -94,6 +94,9 @@ python tools/postprocess.py runs/v3_two_<时间戳> --window 10   # 后处理
 | `control.k` | 0.8 | 约束增益（1/s 量级；e 单位为米） |
 | `task_modes` | ("translate_x","translate_y") | Z 的模态；当前支持命名平移模态或显式 2n 向量 |
 | `task_velocity` / `task_velocity_schedule` | (0,0) / () | w 常值 / 分段常值表；注意 schedule 与基值的一致性 |
+| `execution.deadzone_mode` | `"pwm"` | 死区补偿策略：pwm（默认，消灭低速 bang-bang）/ lift（旧行为对照）/ affine（不推荐） |
+| `execution.heading_deadband_rad` | 0.03 | 航向保持死区：小于该角度的偏差不纠偏（压制航向微振） |
+| `runtime.velocity_ema_alpha` | 0.3 | 速度估计 EMA 系数；大=滞后小，0.5 实车未见收益 |
 | `runtime.converge_eps_m` | 0.03 | 收敛判据（米）——受死区限制，残差下限 ≈ deadband/k |
 
 ## 符号约定与自检

@@ -79,6 +79,18 @@ class ExecutionConfig:
     # parked yaw: mecanum oblique driving is far less efficient than
     # straight driving (08-14 run: 47-73% speed achievement at ~60 deg).
     heading_target_rad: Optional[float] = None
+    # 航向保持死区：|yaw 误差| 小于该值时 omega = 0（抑制航向通道经死区
+    # 抬升产生的极限环；0.03 rad ≈ 1.7°，09-07 实车验证 yaw 摆动显著下降；
+    # 0 = 不启用）。
+    heading_deadband_rad: float = 0.03
+    # 死区补偿策略（振荡治理 A/B 模块）："pwm" 占空比脉冲调制（默认，
+    # 09-07 实车+仿真双证：消灭低速 bang-bang，整向量按比例缩放后以
+    # min_eff 脉冲输出，时间平均等于请求值，瞬时方向保持）；
+    # "lift" 固定抬升（旧行为，留作对照）；"affine" 死区逆
+    # （实车证伪：去量化后振荡同频同幅，不推荐）。
+    deadzone_mode: str = "pwm"
+    # pwm 模式的载波周期（控制拍数；50 Hz 下 10 拍 = 5 Hz 载波）。
+    pwm_period_cycles: int = 10
     mecanum_l_m: float = 0.10  # lx + ly of the X-pattern mecanum chassis
     # Wheel-speed <-> command calibration: command 100 corresponds to this
     # wheel speed (m/s).  Measure it (full command for 2 s, distance / time).
@@ -189,6 +201,11 @@ class RuntimeConfig:
     # window, so position noise / dt stays below the glitch threshold even
     # at high mocap rates.  Larger is smoother but adds feedback lag.
     velocity_diff_baseline_s: float = 0.2
+    # EMA smoothing factor for the pose-only velocity estimate: larger =
+    # less lag and less smoothing.  The feedback delay of this estimator
+    # (baseline/2 + EMA lag) is a phase-lag source for the omni_pid loop;
+    # reduce it (or set require_twist=True) to damp the cruise limit cycle.
+    velocity_ema_alpha: float = 0.3
     stop_on_loss_of_mocap: bool = True
     udp_port: int = 12345
     udp_timeout_s: float = 0.2
@@ -321,6 +338,8 @@ class ExperimentConfig:
             raise ValueError("max_plausible_speed_mps must be positive")
         if self.runtime.velocity_diff_baseline_s <= 0.0:
             raise ValueError("velocity_diff_baseline_s must be positive")
+        if not 0.0 < self.runtime.velocity_ema_alpha <= 1.0:
+            raise ValueError("velocity_ema_alpha must be in (0, 1]")
         if self.runtime.command_speed_limit_mps <= 0.0:
             raise ValueError("command_speed_limit_mps must be positive")
         control = self.control
@@ -348,6 +367,12 @@ class ExperimentConfig:
             raise ValueError("omega_max must be positive")
         if execution.k_omega < 0.0:
             raise ValueError("k_omega must be non-negative")
+        if execution.heading_deadband_rad < 0.0:
+            raise ValueError("heading_deadband_rad must be non-negative")
+        if execution.deadzone_mode not in ("lift", "affine", "pwm"):
+            raise ValueError("deadzone_mode must be 'lift', 'affine' or 'pwm'")
+        if execution.pwm_period_cycles < 1:
+            raise ValueError("pwm_period_cycles must be >= 1")
         if execution.wheel_command_min >= execution.wheel_command_max:
             raise ValueError("wheel_command_min must be less than wheel_command_max")
         if len(execution.wheel_flip) != 4:

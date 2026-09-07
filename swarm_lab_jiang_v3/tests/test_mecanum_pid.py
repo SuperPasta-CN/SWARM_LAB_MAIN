@@ -181,5 +181,30 @@ class HeadingTargetConfigTests(unittest.TestCase):
         self.assertEqual(values["omega"], 0.0)
 
 
+class HeadingDeadbandTests(unittest.TestCase):
+    def test_deadband_suppresses_micro_correction(self) -> None:
+        controller = MecanumPidController(
+            ExecutionConfig(heading_deadband_rad=0.05)
+        )
+        _step(controller, 0.0, 0.0, 0.0)  # captures yaw_target = 0.0
+        values = _step(controller, 0.0, 0.0, 0.03)  # below the 0.05 rad deadband
+        self.assertEqual(values["omega"], 0.0)
+        self.assertEqual(_wheels(values), (0.0, 0.0, 0.0, 0.0))
+
+    def test_above_deadband_still_corrects(self) -> None:
+        controller = MecanumPidController(
+            ExecutionConfig(heading_deadband_rad=0.05)
+        )
+        _step(controller, 0.0, 0.0, 0.0)
+        values = _step(controller, 0.0, 0.0, 0.3)  # beyond the deadband
+        self.assertLess(values["omega"], 0.0)
+
+    def test_zero_deadband_keeps_legacy_behaviour(self) -> None:
+        controller = MecanumPidController(ExecutionConfig(heading_deadband_rad=0.0))
+        _step(controller, 0.0, 0.0, 0.0)
+        values = _step(controller, 0.0, 0.0, 0.01)
+        self.assertNotEqual(values["omega"], 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()

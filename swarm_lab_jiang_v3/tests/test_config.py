@@ -37,12 +37,47 @@ class CatalogConfigTests(unittest.TestCase):
     def test_v3_two_vehicles(self) -> None:
         self.assertEqual(
             {v.vehicle_id: v.address for v in v3_two.CONFIG.vehicles},
-            {"car6": "10.1.1.86", "car5": "10.1.1.85"},
+            {"car4": "10.1.1.84", "car5": "10.1.1.85"},
         )
 
     def test_v3_three_v3_four_vehicle_counts(self) -> None:
         self.assertEqual(len(v3_three.CONFIG.vehicle_ids), 3)
         self.assertEqual(len(v3_four.CONFIG.vehicle_ids), 4)
+
+
+class VariantConfigTests(unittest.TestCase):
+    """Oscillation A/B variants inherit v3_two and must stay valid."""
+
+    def test_variants_validate(self) -> None:
+        from configs import (
+            v3_four_all,
+            v3_three_all,
+            v3_two_affine,
+            v3_two_all,
+            v3_two_ema,
+            v3_two_hdb,
+            v3_two_pwm,
+        )
+        # (deadzone_mode, heading_deadband_rad, velocity_ema_alpha)
+        expected = {
+            "v3_two_affine": ("affine", 0.03, 0.3),
+            "v3_two_pwm": ("pwm", 0.03, 0.3),
+            "v3_two_hdb": ("pwm", 0.035, 0.3),
+            "v3_two_ema": ("pwm", 0.03, 0.5),
+            "v3_two_all": ("pwm", 0.035, 0.3),
+            "v3_three_all": ("pwm", 0.035, 0.3),
+            "v3_four_all": ("pwm", 0.035, 0.3),
+        }
+        for module in (
+            v3_two_affine, v3_two_pwm, v3_two_hdb, v3_two_ema, v3_two_all,
+            v3_three_all, v3_four_all,
+        ):
+            with self.subTest(config=module.CONFIG.name):
+                module.CONFIG.validate()
+                mode, hdb, alpha = expected[module.CONFIG.name]
+                self.assertEqual(module.CONFIG.execution.deadzone_mode, mode)
+                self.assertEqual(module.CONFIG.execution.heading_deadband_rad, hdb)
+                self.assertEqual(module.CONFIG.runtime.velocity_ema_alpha, alpha)
 
     def test_v3_two_schedule(self) -> None:
         self.assertEqual(v3_two.CONFIG.task_velocity, (0.10, 0.0))
@@ -159,7 +194,7 @@ class PlannerFactoryTests(unittest.TestCase):
 
     def test_builds_controller_for_catalog_config(self) -> None:
         planner = build_swarm_planner(v3_two.CONFIG)
-        self.assertEqual(planner.topology.vehicle_ids, ["car6", "car5"])
+        self.assertEqual(planner.topology.vehicle_ids, ["car4", "car5"])
 
 
 if __name__ == "__main__":

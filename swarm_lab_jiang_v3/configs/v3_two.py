@@ -4,10 +4,10 @@ v3 版 crew_two 等价配置：两车、任务速度 w=(0.1, 0)、先静止对�
 
 World frame and desired formation (v3 fixes scale as well as shape):
 
-    car5 * (0, +0.8)
+    car5 * (0, +0.5)
          | +y
          |
-    car6 *----------> +x   (机动方向)
+    car4 *----------> +x   (机动方向)
 
 控制律：u_i = -k * sum_j a_ij (p_i - p_j + b_ij) + Z_i w
 - b_ij = p_j* - p_i* 由 formation 坐标自动计算（含距离的完整位移）；
@@ -16,10 +16,11 @@ World frame and desired formation (v3 fixes scale as well as shape):
 - 任务项位于零空间内，不会被约束项抵消（解耦）。
 
 时序：t∈[0,3) 全员静止（航向自对准 + 静帧纠偏），t=3 s 起整体 +x 巡航
-0.10 m/s。车号按现场可用车辆调整（当前 car6/car5 为 8-14 验证过的组合）。
+0.10 m/s。车号按现场可用车辆调整（当前 car4/car5 为 9-04 实际使用组合，
+间距 0.5 m）。
 
 ROS2 mocap topics (vrpn_client_ros default):
-    /car6/pose  /car6/twist
+    /car4/pose  /car4/twist
     /car5/pose  /car5/twist
 """
 

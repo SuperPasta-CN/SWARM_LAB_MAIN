@@ -15,6 +15,8 @@ produce a true standstill.
 
 from __future__ import annotations
 
+from typing import Optional
+
 from swarm.domain.models import ActuationResult, VehicleState, VelocityCommand
 from swarm.infrastructure.udp_chassis import ChassisSocketDriver
 
@@ -38,6 +40,85 @@ def apply_min_command(values, min_effective: float):
     return lifted
 
 
+class DeadzoneCompensator:
+    """Configurable motor dead-zone compensation (oscillation A/B module).
+
+    Modes (``ExecutionConfig.deadzone_mode``):
+
+    - ``"lift"`` (default): legacy constant lift via :func:`apply_min_command`.
+      Known issue: quantizes the low-speed region to {0, +-min_eff}, which
+      creates a bang-bang limit cycle when the cruise command sits below
+      the threshold.
+    - ``"affine"``: dead-zone inverse —
+      ``out = sign(c) * (min_eff + |c| * (max - min_eff) / max)``.
+      Continuous, monotone authority above the threshold; exact zeros stay
+      zero, so stop commands and the formation deadband still stand still.
+    - ``"pwm"``: when the largest wheel command is below ``min_eff``, the
+      whole vector is scaled so its largest entry equals +-min_eff and
+      emitted only on a duty fraction ``max|c|/min_eff`` of the carrier
+      period — the time average equals the request and the wheel ratios
+      (motion direction) are preserved exactly on every ON cycle.
+    """
+
+    def __init__(
+        self,
+        mode: str = "lift",
+        min_effective: float = 0.0,
+        command_max: float = 100.0,
+        pwm_period_cycles: int = 10,
+    ) -> None:
+        if mode not in ("lift", "affine", "pwm"):
+            raise ValueError("deadzone_mode must be 'lift', 'affine' or 'pwm'")
+        if pwm_period_cycles < 1:
+            raise ValueError("pwm_period_cycles must be >= 1")
+        self.mode = mode
+        self.min_effective = min_effective
+        self.command_max = command_max
+        self.pwm_period_cycles = pwm_period_cycles
+        self._cycle = 0
+
+    def apply(self, values):
+        if self.min_effective <= 0.0:
+            return values
+        if self.mode == "lift":
+            return apply_min_command(values, self.min_effective)
+        if self.mode == "affine":
+            return self._apply_affine(values)
+        return self._apply_pwm(values)
+
+    def _apply_affine(self, values):
+        out = dict(values)
+        span = self.command_max - self.min_effective
+        for key in _WHEEL_KEYS:
+            command = float(out[key])
+            if command != 0.0:
+                magnitude = min(abs(command), self.command_max)
+                out[key] = (
+                    (self.min_effective + magnitude * span / self.command_max)
+                    * (1.0 if command > 0.0 else -1.0)
+                )
+        return out
+
+    def _apply_pwm(self, values):
+        self._cycle = (self._cycle + 1) % self.pwm_period_cycles
+        commands = {key: float(values[key]) for key in _WHEEL_KEYS}
+        strongest = max(abs(command) for command in commands.values())
+        if strongest == 0.0 or strongest >= self.min_effective:
+            return values  # exact zeros stay zero; beyond-threshold pass through
+        duty = strongest / self.min_effective
+        on = self._cycle < duty * self.pwm_period_cycles
+        if not on:
+            out = dict(values)
+            for key in _WHEEL_KEYS:
+                out[key] = 0.0
+            return out
+        scale = self.min_effective / strongest
+        out = dict(values)
+        for key in _WHEEL_KEYS:
+            out[key] = commands[key] * scale
+        return out
+
+
 class GroundVehicleActuator:
     """Translate a planner velocity into wheels and deliver it to one chassis."""
 
@@ -49,11 +130,13 @@ class GroundVehicleActuator:
         controller,
         driver: ChassisSocketDriver,
         min_command: float = 0.0,
+        compensator: Optional[DeadzoneCompensator] = None,
     ) -> None:
         self.vehicle_id = vehicle_id
         self.controller = controller
         self.driver = driver
         self.min_command = min_command
+        self.compensator = compensator
 
     def execute(
         self,
@@ -71,7 +154,10 @@ class GroundVehicleActuator:
             measured_vz=state.vz,
             dt=dt,
         )
-        values = apply_min_command(values, self.min_command)
+        if self.compensator is not None:
+            values = self.compensator.apply(values)
+        else:
+            values = apply_min_command(values, self.min_command)
         sent = self.driver.send(values)
         return ActuationResult(self.vehicle_id, self.platform, values, sent)
 

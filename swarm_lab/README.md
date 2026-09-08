@@ -32,6 +32,54 @@ u_i = −k · Σ_{j∈N_i} A_ij·(p_i − p_j + b_ij)  +  Z_i · w
 
 **工具：`constant_velocity`** —— 恒速阶跃 planner，底盘标定/测速用。
 
+## 底层运动控制逻辑（关键代码）
+
+planner 输出的世界系速度 `VelocityCommand(vx, vy)` 到轮子的完整链路，
+按执行顺序（每车每拍 50 Hz 走一遍）：
+
+```
+VelocityCommand(世界系 m/s)
+  │  GroundVehicleActuator.execute            infrastructure/ground_vehicle.py:155
+  ├─ 1) 航向保持 → 角速度 omega               algorithms/mecanum_pid.py:56 (_heading_omega)
+  ├─ 2) 世界系→车体系旋转 + 速度前馈/PI 闭环   algorithms/mecanum_pid.py:74 (step)
+  ├─ 3) 麦轮逆运动学 → 四轮线速度             algorithms/mecanum_pid.py:110
+  ├─ 4) 等比缩放（保方向）+ 轮指令限幅        algorithms/mecanum_pid.py:124
+  ├─ 5) 死区补偿（默认 PWM 占空比）           infrastructure/ground_vehicle.py:43 (DeadzoneCompensator)
+  └─ 6) UDP 下发 "<FL,FR,RL,RR>"              infrastructure/udp_chassis.py:43
+```
+
+各环节要点：
+
+- **执行模式三态**（`execution.mode`，分发在 `bootstrap.py` 装配）：
+  `omni_pid`（默认，麦轮+速度闭环）/ `omni`（麦轮开环，
+  `algorithms/mecanum.py:72`）/ `diff`（差速双 PID，
+  `algorithms/differential.py`，对照用）。
+- **航向保持**（`mecanum_pid.py:56-72`）：`heading_target_rad` 设定时
+  各车解锁后原地转向该世界系航向（对准机动方向，避免麦轮 60° 斜行
+  只剩 47–73% 效率的老问题）；未设定则捕获解锁瞬间的 yaw。
+  `heading_deadband_rad`（默认 0.03 rad ≈ 1.7°）以内不纠偏——防止
+  微小航向误差经死区抬升变成原地抖动极限环。
+- **速度闭环**（`mecanum_pid.py:88-103`）：前馈 = 世界系目标速度旋转到
+  车体系；反馈 = mocap 实测速度（位置差分+EMA）同旋转；车体系 PI
+  校正（`execution.omni_velocity_pid`，kp=0.6/ki=1.2/kd=0——kd 必须
+  为 0，反馈是差分噪声）。**目标为零时输出精确零**（92-97 行），
+  绕过死区抬升，保证能真正停车。
+- **麦轮逆运动学**（`mecanum_pid.py:110-117`）：X 型布置，
+  `FL = vx−vy−ωL`，`FR = vx+vy+ωL`，`RL = vx+vy−ωL`，`RR = vx−vy+ωL`
+  （L = `mecanum_l_m`），再乘 `wheel_flip` 逐车方向修正。
+- **等比缩放 + 限幅**（`mecanum_pid.py:124-137`）：最快轮超
+  `max_wheel_speed_mps` 时四轮**等比**缩放（运动方向不变），再映射到
+  轮指令域 ±100 并硬限幅。
+- **死区补偿**（`ground_vehicle.py:43-133`，`execution.deadzone_mode`）：
+  电机死区（静摩擦）是低速振荡的主因。默认 `pwm`：指令低于 min_eff
+  时不抬升，而是按占空比整周期脉冲输出——ON 拍四轮**整向量等比**
+  放大到 min_eff（瞬时方向保持），OFF 拍全零，时间平均等于请求值；
+  设了逐车 `pwm_v_on_mps` 后占空比按实测车速归一化
+  （`duty = (指令×calib/100)/v_on`），消除车辆间增益差异。
+  `lift`（固定抬升，旧行为）与 `affine`（死区逆，实车证伪）留作对照。
+- **UDP 下发**（`udp_chassis.py`）：持久 socket，线格式
+  `"<FL,FR,RL,RR>"`（与车队固件约定，历代未变）。
+
 ## 配置目录（configs/）
 
 | 配置 | 算法 | 车辆 | 内容 |

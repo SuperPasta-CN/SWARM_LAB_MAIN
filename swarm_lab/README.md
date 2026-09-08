@@ -80,6 +80,22 @@ VelocityCommand(世界系 m/s)
 - **UDP 下发**（`udp_chassis.py`）：持久 socket，线格式
   `"<FL,FR,RL,RR>"`（与车队固件约定，历代未变）。
 
+## 振荡治理：成因 → 对策 → 代码
+
+低速振荡是 v3 实车阶段的核心问题，完整归因分析见 `../report_v3/`。
+结论性因果链与对应代码（全部默认开启，无需配置即生效）：
+
+| 成因（实车+仿真确认） | 对策机制 | 代码位置 |
+| --- | --- | --- |
+| **机械死区**（静摩擦，振荡主因）：轮指令低于 min_eff 车不动，旧方案硬抬升指令 → 低速 bang-bang 极限环 | **PWM 占空比脉冲调制**：指令低于 min_eff 时不抬升，按占空比整周期脉冲——ON 拍四轮整向量等比放大到 min_eff（瞬时方向保持），OFF 拍全零，时间平均 = 请求值 | `ground_vehicle.py:108`（`_apply_pwm`），`execution.deadzone_mode="pwm"`（默认），载波 `pwm_period_cycles=10`（50 Hz 下 5 Hz） |
+| **车辆间增益差异**：同一占空比不同车实际车速不同 → 队形内相对拉扯 | **逐车 v_on 归一化**：`duty = (指令×calib/100)/v_on`，v_on 由 `calibrate_car` 实测 | `ground_vehicle.py:114-118`，`pwm_v_on_mps`（逐车 override） |
+| **航向微纠偏**经死区抬升成旋转极限环 | **航向死区**：yaw 误差 < 0.03 rad（≈1.7°）不纠偏 | `mecanum_pid.py:66-70`，`execution.heading_deadband_rad` |
+| **反馈相位滞后**（mocap 位置差分+EMA）放大巡航极限环 | 基线窗差分抑制量化噪声 + 可调 EMA；要求更低滞后可直连 twist | `ros2_mocap.py:48`（`trim_pose_history`），`runtime.velocity_diff_baseline_s=0.2` / `velocity_ema_alpha=0.3` / `require_twist` |
+| **约束项低速微调**节拍死区 bang-bang | **planner 侧死区**：成形后的约束项 < 0.015 m/s 直接归零（任务项永不受影响，保机动精度） | `task_driven.py`（`_shape`），`control.deadband_mps` |
+
+对照开关：`deadzone_mode="lift"` 恢复旧行为（振荡复现，供论文对比）；
+`heading_deadband_rad=0` 关闭航向死区。
+
 ## 配置目录（configs/）
 
 | 配置 | 算法 | 车辆 | 内容 |
